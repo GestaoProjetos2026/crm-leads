@@ -1,0 +1,11 @@
+{
+  "name": "sales-weakness-backend",
+  "version": "1.0.0",
+  "description": "Basic Node.js backend",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "",
+  "license": "ISC"
+}
