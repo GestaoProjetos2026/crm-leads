@@ -62,4 +62,20 @@ A pasta `/docs` contém detalhamentos riquíssimos da engenharia e produto. Aces
 * [Imagem do Banco de Dados](./docs/Banco_de_dados_v0.0.png)
 
 ---
+
+## 🚀 Como Executar o Backend
+
+1. Certifique-se de ter o **Node.js** instalado na sua máquina.
+2. Navegue até a pasta raiz do projeto (`SalesWeakness`).
+3. Instale as dependências (caso existam) executando:
+   ```bash
+   npm install
+   ```
+4. Inicie o servidor:
+   ```bash
+   npm start
+   ```
+   > O servidor de desenvolvimento será iniciado e estará acessível em: `http://localhost:3000/`
+
+---
 *Gerado a partir das definições iniciais do projeto SalesWeakness. Mantendo o foco em auditoria acionável.*
