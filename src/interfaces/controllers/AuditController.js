@@ -6,7 +6,7 @@ export class AuditController {
 
   async getBottlenecks(req, res) {
     try {
-      const companyId = req.query?.companyId || req.body?.companyId; // in a real app, from auth token
+      const companyId = req.query?.companyId || req.body?.companyId; // TODO: in a real app, from auth token
       
       if (!companyId) {
         return this._badRequest(res, 'Missing companyId query parameter');
@@ -32,7 +32,7 @@ export class AuditController {
          return this._badRequest(res, 'Missing companyId parameter');
       }
 
-      // Mocking start/endDate for prototype
+      // TODO: Mocking start/endDate for prototype
       const latencyData = await this.calculateConversionLatencyUseCase.execute(companyId, null, null);
 
       res.statusCode = 200;

@@ -26,7 +26,7 @@ export class InMemoryLeadRepository {
   }
 
   async getStagnantCandidates(companyId, batchSize = 1000) {
-    // In a real database, this would filter by companyId and perhaps only fetch
+    // TODO: In a real database, this would filter by companyId and perhaps only fetch
     // leads that haven't been modified recently to save memory. 
     // Here we just return all leads for the company up to batchSize.
     const candidates = this.leads

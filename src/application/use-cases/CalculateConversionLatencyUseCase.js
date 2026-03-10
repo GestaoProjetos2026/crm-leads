@@ -2,14 +2,14 @@ export class CalculateConversionLatencyUseCase {
   constructor({ auditLogRepository, leadRepository }) {
     // Note: To accurately calculate true conversion latency between A and B,
     // we would actually need a LeadHistoryRepository not just Audit Logs.
-    // For this demonstration/prototype based on the UC06 spec, we are providing a simple stub or basic calculation.
+    // TODO: For this demonstration/prototype based on the UC06 spec, we are providing a simple stub or basic calculation.
     this.auditLogRepository = auditLogRepository;
     this.leadRepository = leadRepository;
   }
 
   async execute(companyId, startDate, endDate) {
-    // In a real scenario, this would aggregate transition logs (not just stagnation logs)
-    // Here we will return a mock structure simulating RF04.
+    // TODO: In a real scenario, this would aggregate transition logs (not just stagnation logs)
+    // TODO: Here we will return a mock structure simulating RF04.
     
     // Example: SELECT avg(time) FROM transition_logs WHERE companyId = ? ... GROUP BY stage_from, stage_to
     

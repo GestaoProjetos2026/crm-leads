@@ -24,7 +24,7 @@ async function bootstrap() {
   const leadRepo = new InMemoryLeadRepository();
   const auditRepo = new InMemoryAuditLogRepository();
 
-  // Load Mock Data
+  // TODO: Load Mock Data
   await stageRepo.save(new Stage({ id: 'stage-1', name: 'Triagem', companyId, slaLimit: 2 })); // 2 hours SLA
   await stageRepo.save(new Stage({ id: 'stage-2', name: 'Qualificação', companyId, slaLimit: 24 })); // 24 hours SLA
 
@@ -57,7 +57,7 @@ async function bootstrap() {
   const router = new Router(stageController, auditController);
 
   // 5. Setup Worker
-  // Run every 10 seconds for prototype testing instead of 15 minutes
+  // TODO: Run every 10 seconds for prototype testing instead of 15 minutes
   process.env.WORKER_INTERVAL_MS = '10000';
   const worker = new StagnationWorker({ scanStagnantLeadsUseCase: scanStagnantUseCase, companyIds: [companyId] });
   worker.start();

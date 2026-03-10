@@ -12,7 +12,7 @@ export class InMemoryAuditLogRepository {
   }
 
   async hasRecentLogForLead(leadId, stageId) {
-    // Simplified: check if an alert for this lead in this specific stage already exists
+    // TODO: Simplified: check if an alert for this lead in this specific stage already exists
     return this.logs.some(log => 
       log.leadId === leadId && 
       log.stageId === stageId && 

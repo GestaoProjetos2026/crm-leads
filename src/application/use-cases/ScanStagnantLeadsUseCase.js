@@ -44,7 +44,7 @@ export class ScanStagnantLeadsUseCase {
 
              await this.auditLogRepository.save(auditLog);
              
-             // In a real system, you might trigger a Webhook / Event here:
+             // TODO: In a real system, you might trigger a Webhook / Event here:
              // eventBus.publish('lead.stagnated', auditLog);
           }
         }

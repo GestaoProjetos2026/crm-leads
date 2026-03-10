@@ -8,7 +8,7 @@ export class Router {
 
   async handleRequest(req, res) {
     try {
-      // Very basic body parser for demonstration
+      // TODO: Very basic body parser for demonstration
       let body = '';
       req.on('data', chunk => {
         body += chunk.toString();
@@ -26,7 +26,7 @@ export class Router {
         
         req.query = Object.fromEntries(parsedUrl.searchParams);
 
-        // Simple router
+        // TODO: Simple router
         if (req.method === 'POST' && pathname.match(/^\/v1\/config\/stages\/(.+)\/sla$/)) {
           const match = pathname.match(/^\/v1\/config\/stages\/(.+)\/sla$/);
           req.params = { id: match[1] };

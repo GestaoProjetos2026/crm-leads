@@ -2,7 +2,7 @@ export class StagnationWorker {
   constructor({ scanStagnantLeadsUseCase, companyIds = [] }) {
     this.scanStagnantLeadsUseCase = scanStagnantLeadsUseCase;
     this.intervalMs = process.env.WORKER_INTERVAL_MS || 15 * 60 * 1000; // Default 15 mins
-    this.companyIds = companyIds; // Mock: List of active tenant IDs to scan
+    this.companyIds = companyIds; // TODO: Mock: List of active tenant IDs to scan
     this.timer = null;
   }
 
