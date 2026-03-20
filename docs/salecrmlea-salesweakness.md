@@ -44,7 +44,7 @@ Para garantir a entrega ágil e focada na proposta de valor inicial, a versão 1
 > 💡 **Nota de adição:** Inseri a Stack Tecnológica sugerida para dar clareza arquitetural aos desenvolvedores e facilitar a configuração do ambiente.
 
 #### Stack Tecnológica Sugerida
-* **Backend:** Node.js (Express/NestJS) ou Python (FastAPI/Django).
+* **Backend:** Node.js (Express/NestJS).
 * **Banco de Dados Relacional:** PostgreSQL (ideal para aplicar RLS).
 * **Cache e Filas:** Redis (Analytics) e RabbitMQ/AWS SQS (Processamento assíncrono de Webhooks).
 * **Infraestrutura:** Docker e Kubernetes (K8s).
