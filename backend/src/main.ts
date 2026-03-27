@@ -1,23 +1,18 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import helmet from 'helmet';
-
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
-import { TenantContextInterceptor } from './common/interceptors/tenant-context.interceptor';
-import { setupSwagger } from './swagger.config.js';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  const configService = app.get(ConfigService);
 
-  // Security
-  app.use(helmet());
-  app.enableCors();
-
-  // Global Config
+  // ── Global prefix ─────────────────────────────────────────────────────────
   app.setGlobalPrefix('v1');
+
+  // ── Global validation pipe ────────────────────────────────────────────────
+  // Strips unknown properties, whitelists declared DTO fields, and auto-throws
+  // 422-style validation errors using class-validator decorators.
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -26,17 +21,27 @@ async function bootstrap() {
     }),
   );
 
-  // Global Exeption Filter & Interceptors
+  // ── Global exception filter ───────────────────────────────────────────────
   app.useGlobalFilters(new HttpExceptionFilter());
-  app.useGlobalInterceptors(new TenantContextInterceptor());
 
-  // Swagger Documentation
-  setupSwagger(app);
+  // ── Swagger / OpenAPI ─────────────────────────────────────────────────────
+  const swaggerConfig = new DocumentBuilder()
+    .setTitle('SalesWeakness API')
+    .setDescription(
+      'SaaS multi-tenant CRM & Sales Automation — diagnostic platform',
+    )
+    .setVersion('1.0')
+    .addBearerAuth(
+      { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' },
+      'JWT',
+    )
+    .addApiKey({ type: 'apiKey', in: 'header', name: 'X-API-Key' }, 'ApiKey')
+    .build();
 
-  const port = configService.get<number>('app.port') ?? 3000;
+  const document = SwaggerModule.createDocument(app, swaggerConfig);
+  SwaggerModule.setup('docs', app, document);
+
+  const port = process.env.PORT ?? 3000;
   await app.listen(port);
-  console.log(`Application is running on: http://localhost:${port}/v1`);
-  console.log(`Swagger docs at: http://localhost:${port}/api/docs`);
 }
-
-bootstrap();
+void bootstrap();
