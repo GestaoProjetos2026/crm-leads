@@ -1,5 +1,7 @@
 Você é um engenheiro de software sênior especialista em arquitetura SaaS.
 
+O Claude começou a desenvolver o projeto, mas parou na metade. Continue o que ele já começou.
+
 Estamos construindo um sistema chamado SalesWeakness com as seguintes características:
 
 - SaaS multi-tenant
