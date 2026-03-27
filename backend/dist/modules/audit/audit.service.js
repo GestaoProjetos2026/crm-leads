@@ -18,9 +18,9 @@ const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
 const audit_log_entity_1 = require("./entities/audit-log.entity");
 let AuditService = class AuditService {
-    auditRepository;
-    constructor(auditRepository) {
-        this.auditRepository = auditRepository;
+    auditLogRepository;
+    constructor(auditLogRepository) {
+        this.auditLogRepository = auditLogRepository;
     }
 };
 exports.AuditService = AuditService;

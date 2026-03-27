@@ -11,10 +11,6 @@ import { AuditLog } from './entities/audit-log.entity';
 export class AuditService {
   constructor(
     @InjectRepository(AuditLog)
-<<<<<<< HEAD
-    private readonly auditRepository: Repository<AuditLog>,
-=======
     private readonly auditLogRepository: Repository<AuditLog>,
->>>>>>> origin/copilot/read-project-documents
   ) { }
 }

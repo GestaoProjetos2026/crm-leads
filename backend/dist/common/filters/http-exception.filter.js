@@ -19,8 +19,8 @@ let HttpExceptionFilter = HttpExceptionFilter_1 = class HttpExceptionFilter {
         const exceptionResponse = exception.getResponse();
         const message = typeof exceptionResponse === 'string'
             ? exceptionResponse
-            : exceptionResponse.message ??
-                exception.message;
+            : (exceptionResponse.message ??
+                exception.message);
         const body = {
             statusCode: status,
             timestamp: new Date().toISOString(),
@@ -28,7 +28,7 @@ let HttpExceptionFilter = HttpExceptionFilter_1 = class HttpExceptionFilter {
             method: req.method,
             message,
         };
-        if (status >= common_1.HttpStatus.INTERNAL_SERVER_ERROR) {
+        if (status >= 500) {
             this.logger.error(JSON.stringify(body), exception.stack);
         }
         res.status(status).json(body);

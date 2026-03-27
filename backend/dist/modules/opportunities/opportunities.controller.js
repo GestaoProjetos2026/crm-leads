@@ -22,7 +22,7 @@ let OpportunitiesController = class OpportunitiesController {
 exports.OpportunitiesController = OpportunitiesController;
 exports.OpportunitiesController = OpportunitiesController = __decorate([
     (0, swagger_1.ApiTags)('opportunities'),
-    (0, common_1.Controller)('opportunities'),
+    (0, common_1.Controller)('deals'),
     __metadata("design:paramtypes", [opportunities_service_1.OpportunitiesService])
 ], OpportunitiesController);
 //# sourceMappingURL=opportunities.controller.js.map

@@ -22,7 +22,7 @@ let AuditController = class AuditController {
 exports.AuditController = AuditController;
 exports.AuditController = AuditController = __decorate([
     (0, swagger_1.ApiTags)('audit'),
-    (0, common_1.Controller)('audit'),
+    (0, common_1.Controller)('funnel'),
     __metadata("design:paramtypes", [audit_service_1.AuditService])
 ], AuditController);
 //# sourceMappingURL=audit.controller.js.map
