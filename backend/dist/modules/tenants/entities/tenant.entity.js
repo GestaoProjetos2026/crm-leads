@@ -23,15 +23,15 @@ __decorate([
     __metadata("design:type", Number)
 ], Tenant.prototype, "id", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ length: 255 }),
+    (0, typeorm_1.Column)({ length: 255, type: 'varchar' }),
     __metadata("design:type", String)
 ], Tenant.prototype, "name", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ default: 'starter' }),
+    (0, typeorm_1.Column)({ default: 'starter', type: 'varchar' }),
     __metadata("design:type", String)
 ], Tenant.prototype, "plan", void 0);
 __decorate([
-    (0, typeorm_1.CreateDateColumn)({ name: 'created_at' }),
+    (0, typeorm_1.CreateDateColumn)({ name: 'created_at', type: 'date' }),
     __metadata("design:type", Date)
 ], Tenant.prototype, "createdAt", void 0);
 exports.Tenant = Tenant = __decorate([

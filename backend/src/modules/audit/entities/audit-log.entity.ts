@@ -15,23 +15,23 @@ export class AuditLog {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Column({ name: 'tenant_id' })
+  @Column({ name: 'tenant_id', type: 'int' })
   tenantId!: number;
 
-  @Column({ name: 'opportunity_id' })
+  @Column({ name: 'opportunity_id', type: 'int' })
   opportunityId!: number;
 
   /**
    * Weakness classification: Stagnation | Low_Conversion
    * Maps to audit_logs.weakness_type in the architecture spec.
    */
-  @Column({ name: 'weakness_type', length: 50 })
+  @Column({ name: 'weakness_type', type: 'varchar', length: 50 })
   weaknessType!: string;
 
   @Column({ type: 'text', nullable: true })
   description!: string | null;
 
   /** Immutable — set on creation, never updated */
-  @CreateDateColumn({ name: 'created_at' })
+  @CreateDateColumn({ name: 'created_at', type: 'date' })
   createdAt!: Date;
 }

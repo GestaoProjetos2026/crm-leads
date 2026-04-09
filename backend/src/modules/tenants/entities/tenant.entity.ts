@@ -14,13 +14,13 @@ export class Tenant {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Column({ length: 255 })
+  @Column({ length: 255, type: 'varchar' })
   name!: string;
 
   /** Subscription plan: free | starter | professional | enterprise */
-  @Column({ default: 'starter' })
+  @Column({ default: 'starter', type: 'varchar' })
   plan!: string;
 
-  @CreateDateColumn({ name: 'created_at' })
+  @CreateDateColumn({ name: 'created_at', type: 'date' })
   createdAt!: Date;
 }
