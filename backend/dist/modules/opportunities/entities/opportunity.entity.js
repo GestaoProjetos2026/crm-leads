@@ -30,19 +30,19 @@ __decorate([
     __metadata("design:type", Number)
 ], Opportunity.prototype, "id", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ name: 'tenant_id' }),
+    (0, typeorm_1.Column)({ name: 'tenant_id', type: 'int' }),
     __metadata("design:type", Number)
 ], Opportunity.prototype, "tenantId", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ name: 'lead_id' }),
+    (0, typeorm_1.Column)({ name: 'lead_id', type: 'int' }),
     __metadata("design:type", Number)
 ], Opportunity.prototype, "leadId", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ name: 'stage_id' }),
+    (0, typeorm_1.Column)({ name: 'stage_id', type: 'int' }),
     __metadata("design:type", Number)
 ], Opportunity.prototype, "stageId", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ name: 'assigned_user_id', nullable: true }),
+    (0, typeorm_1.Column)({ name: 'assigned_user_id', type: 'int', nullable: true }),
     __metadata("design:type", Object)
 ], Opportunity.prototype, "assignedUserId", void 0);
 __decorate([
@@ -50,11 +50,11 @@ __decorate([
     __metadata("design:type", Object)
 ], Opportunity.prototype, "value", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ default: 'Open', length: 20 }),
+    (0, typeorm_1.Column)({ default: 'Open', type: 'varchar', length: 20 }),
     __metadata("design:type", String)
 ], Opportunity.prototype, "status", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ name: 'lost_reason', length: 255, nullable: true }),
+    (0, typeorm_1.Column)({ name: 'lost_reason', type: 'varchar', length: 255, nullable: true }),
     __metadata("design:type", Object)
 ], Opportunity.prototype, "lostReason", void 0);
 __decorate([
@@ -62,11 +62,11 @@ __decorate([
     __metadata("design:type", Object)
 ], Opportunity.prototype, "expectedCloseDate", void 0);
 __decorate([
-    (0, typeorm_1.CreateDateColumn)({ name: 'created_at' }),
+    (0, typeorm_1.CreateDateColumn)({ name: 'created_at', type: 'date' }),
     __metadata("design:type", Date)
 ], Opportunity.prototype, "createdAt", void 0);
 __decorate([
-    (0, typeorm_1.UpdateDateColumn)({ name: 'updated_at' }),
+    (0, typeorm_1.UpdateDateColumn)({ name: 'updated_at', type: 'date' }),
     __metadata("design:type", Date)
 ], Opportunity.prototype, "updatedAt", void 0);
 exports.Opportunity = Opportunity = __decorate([

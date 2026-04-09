@@ -1,18 +1,25 @@
-version: '3.8'
-
 services:
   postgres:
-    image: postgres:16-alpine
+    image: postgres:16
     container_name: salesweakness-db
     restart: unless-stopped
+    networks:
+      - app-network
     environment:
       POSTGRES_USER: ${DB_USER:-salesweakness}
       POSTGRES_PASSWORD: ${DB_PASSWORD:-salesweakness}
       POSTGRES_DB: ${DB_NAME:-salesweakness}
-    ports:
-      - '5432:5432'
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - /var/postgres-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    command: >
+      postgres
+      -c shared_buffers=4GB
+      -c effective_cache_size=12GB
+      -c work_mem=16MB
+      -c maintenance_work_mem=1GB
+      -c random_page_cost=1.8
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U ${DB_USER:-salesweakness}']
       interval: 10s
@@ -20,6 +27,8 @@ services:
       retries: 5
 
   redis:
+    networks:
+      - app-network
     image: redis:7-alpine
     container_name: salesweakness-redis
     restart: unless-stopped
@@ -35,18 +44,20 @@ services:
       retries: 5
 
   backend:
+    network_mode: host  # usa a rede do host diretamente
     build:
       context: ./backend
       target: development
+      network: host
     container_name: salesweakness-api
     restart: unless-stopped
     ports:
-      - '3000:3000'
+      - '0.0.0.0:3000:3000'
     env_file:
       - ./backend/.env
     environment:
-      - DB_HOST=postgres
-      - REDIS_HOST=redis
+      - DB_HOST=localhost
+      - REDIS_HOST=localhost
     depends_on:
       postgres:
         condition: service_healthy
@@ -55,6 +66,10 @@ services:
     volumes:
       - ./backend:/usr/src/app
       - /usr/src/app/node_modules
+
+networks:
+  app-network:
+    driver: bridge
 
 volumes:
   postgres_data:

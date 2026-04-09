@@ -7,8 +7,8 @@ export default registerAs(
     type: 'postgres',
     host: process.env.DB_HOST ?? 'localhost',
     port: parseInt(process.env.DB_PORT ?? '5432', 10),
-    database: process.env.DB_NAME ?? 'salesweakness',
-    username: process.env.DB_USER ?? 'salesweakness',
+    database: process.env.DB_NAME ?? 'sales_weakness',
+    username: process.env.DB_USER ?? 'sales_weakness',
     password: process.env.DB_PASSWORD ?? 'salesweakness',
     // Entities are auto-loaded via TypeOrmModule.forFeature() in each module
     autoLoadEntities: true,

@@ -15,33 +15,33 @@ export class Lead {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Column({ name: 'tenant_id' })
+  @Column({ name: 'tenant_id', type: 'int' })
   tenantId!: number;
 
-  @Column({ name: 'campaign_id', nullable: true })
+  @Column({ name: 'campaign_id', type: 'int', nullable: true })
   campaignId!: number | null;
 
-  @Column({ name: 'first_name', length: 255 })
+  @Column({ name: 'first_name', type: 'varchar', length: 255 })
   firstName!: string;
 
-  @Column({ name: 'last_name', length: 255 })
+  @Column({ name: 'last_name', type: 'varchar', length: 255 })
   lastName!: string;
 
-  @Column({ length: 255 })
+  @Column({ length: 255, type: 'varchar' })
   email!: string;
 
   /** Lead origin channel: facebook_leads, landing_page, etc. (RF required) */
-  @Column({ length: 100 })
+  @Column({ length: 100, type: 'varchar' })
   source!: string;
 
   /** Soft-delete flag — set to true after 180d without interaction (RF03) */
-  @Column({ name: 'is_inactive', default: false })
+  @Column({ name: 'is_inactive', type: 'bool', default: false })
   isInactive!: boolean;
 
-  @CreateDateColumn({ name: 'created_at' })
+  @CreateDateColumn({ name: 'created_at', type: 'date' })
   createdAt!: Date;
 
   /** Monitored by inactivity Worker for 180d threshold */
-  @UpdateDateColumn({ name: 'updated_at' })
+  @UpdateDateColumn({ name: 'updated_at', type: 'date' })
   updatedAt!: Date;
 }

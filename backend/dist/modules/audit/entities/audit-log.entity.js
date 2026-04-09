@@ -25,15 +25,15 @@ __decorate([
     __metadata("design:type", Number)
 ], AuditLog.prototype, "id", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ name: 'tenant_id' }),
+    (0, typeorm_1.Column)({ name: 'tenant_id', type: 'int' }),
     __metadata("design:type", Number)
 ], AuditLog.prototype, "tenantId", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ name: 'opportunity_id' }),
+    (0, typeorm_1.Column)({ name: 'opportunity_id', type: 'int' }),
     __metadata("design:type", Number)
 ], AuditLog.prototype, "opportunityId", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ name: 'weakness_type', length: 50 }),
+    (0, typeorm_1.Column)({ name: 'weakness_type', type: 'varchar', length: 50 }),
     __metadata("design:type", String)
 ], AuditLog.prototype, "weaknessType", void 0);
 __decorate([
@@ -41,7 +41,7 @@ __decorate([
     __metadata("design:type", Object)
 ], AuditLog.prototype, "description", void 0);
 __decorate([
-    (0, typeorm_1.CreateDateColumn)({ name: 'created_at' }),
+    (0, typeorm_1.CreateDateColumn)({ name: 'created_at', type: 'date' }),
     __metadata("design:type", Date)
 ], AuditLog.prototype, "createdAt", void 0);
 exports.AuditLog = AuditLog = __decorate([

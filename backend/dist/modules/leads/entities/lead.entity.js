@@ -29,39 +29,39 @@ __decorate([
     __metadata("design:type", Number)
 ], Lead.prototype, "id", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ name: 'tenant_id' }),
+    (0, typeorm_1.Column)({ name: 'tenant_id', type: 'int' }),
     __metadata("design:type", Number)
 ], Lead.prototype, "tenantId", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ name: 'campaign_id', nullable: true }),
+    (0, typeorm_1.Column)({ name: 'campaign_id', type: 'int', nullable: true }),
     __metadata("design:type", Object)
 ], Lead.prototype, "campaignId", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ name: 'first_name', length: 255 }),
+    (0, typeorm_1.Column)({ name: 'first_name', type: 'varchar', length: 255 }),
     __metadata("design:type", String)
 ], Lead.prototype, "firstName", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ name: 'last_name', length: 255 }),
+    (0, typeorm_1.Column)({ name: 'last_name', type: 'varchar', length: 255 }),
     __metadata("design:type", String)
 ], Lead.prototype, "lastName", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ length: 255 }),
+    (0, typeorm_1.Column)({ length: 255, type: 'varchar' }),
     __metadata("design:type", String)
 ], Lead.prototype, "email", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ length: 100 }),
+    (0, typeorm_1.Column)({ length: 100, type: 'varchar' }),
     __metadata("design:type", String)
 ], Lead.prototype, "source", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ name: 'is_inactive', default: false }),
+    (0, typeorm_1.Column)({ name: 'is_inactive', type: 'bool', default: false }),
     __metadata("design:type", Boolean)
 ], Lead.prototype, "isInactive", void 0);
 __decorate([
-    (0, typeorm_1.CreateDateColumn)({ name: 'created_at' }),
+    (0, typeorm_1.CreateDateColumn)({ name: 'created_at', type: 'date' }),
     __metadata("design:type", Date)
 ], Lead.prototype, "createdAt", void 0);
 __decorate([
-    (0, typeorm_1.UpdateDateColumn)({ name: 'updated_at' }),
+    (0, typeorm_1.UpdateDateColumn)({ name: 'updated_at', type: 'date' }),
     __metadata("design:type", Date)
 ], Lead.prototype, "updatedAt", void 0);
 exports.Lead = Lead = __decorate([

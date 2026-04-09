@@ -18,8 +18,17 @@ let LeadsController = class LeadsController {
     constructor(leadsService) {
         this.leadsService = leadsService;
     }
+    teste() {
+        return 'Apenas um teste Andreas :D';
+    }
 };
 exports.LeadsController = LeadsController;
+__decorate([
+    (0, common_1.Get)(),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", String)
+], LeadsController.prototype, "teste", null);
 exports.LeadsController = LeadsController = __decorate([
     (0, swagger_1.ApiTags)('leads'),
     (0, common_1.Controller)('leads'),
