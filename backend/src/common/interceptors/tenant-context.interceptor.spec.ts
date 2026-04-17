@@ -4,6 +4,13 @@ import { of } from 'rxjs';
 import type { RequestWithTenant } from '../interfaces/request-with-tenant.interface';
 import type { JwtPayload } from '../interfaces/jwt-payload.interface';
 
+// Mock do tenantContext adicionado para evitar o erro de 'undefined' no .run()
+jest.mock('../context/tenant.context', () => ({
+  tenantContext: {
+    run: jest.fn((id, cb) => cb()),
+  },
+}));
+
 function createMockContext(user: Partial<JwtPayload> | undefined): {
   ctx: ExecutionContext;
   req: Partial<RequestWithTenant>;
