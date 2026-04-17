@@ -21,6 +21,9 @@ export class Tenant {
   @Column({ default: 'starter', type: 'varchar' })
   plan!: string;
 
+  @Column({ name: 'is_blocked', type: 'boolean', default: false })
+  isBlocked!: boolean;
+
   @CreateDateColumn({ name: 'created_at', type: 'date' })
   createdAt!: Date;
 }
