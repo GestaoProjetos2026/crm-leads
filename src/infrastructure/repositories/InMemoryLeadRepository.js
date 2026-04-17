@@ -16,6 +16,11 @@ export class InMemoryLeadRepository {
       .map(lead => new Lead(lead));
   }
 
+  async findByEmailAndTenant(email, companyId) {
+    const lead = this.leads.find(l => l.email === email && l.companyId === companyId);
+    return lead ? new Lead(lead) : null;
+  }
+
   async save(lead) {
       const index = this.leads.findIndex(l => l.id === lead.id);
       if (index !== -1) {
@@ -26,9 +31,6 @@ export class InMemoryLeadRepository {
   }
 
   async getStagnantCandidates(companyId, batchSize = 1000) {
-    // TODO: In a real database, this would filter by companyId and perhaps only fetch
-    // leads that haven't been modified recently to save memory. 
-    // Here we just return all leads for the company up to batchSize.
     const candidates = this.leads
       .filter(l => l.companyId === companyId)
       .slice(0, batchSize);

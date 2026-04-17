@@ -1,9 +1,14 @@
 export class Lead {
-  constructor({ id, currentStageId, companyId, lastMovedAt }) {
+  constructor({ id, currentStageId, companyId, lastMovedAt, email, firstName, lastName, source, campaignId }) {
     this.id = id;
     this.currentStageId = currentStageId;
     this.companyId = companyId;
     this.lastMovedAt = new Date(lastMovedAt);
+    this.email = email;
+    this.firstName = firstName;
+    this.lastName = lastName;
+    this.source = source;
+    this.campaignId = campaignId;
   }
 
   isStagnated(slaLimitHours, currentTime = new Date()) {

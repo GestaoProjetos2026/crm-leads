@@ -1,55 +1,116 @@
 import { URL } from 'url';
 
 export class Router {
-  constructor(stageController, auditController) {
+  constructor(stageController, auditController, leadController) {
     this.stageController = stageController;
     this.auditController = auditController;
+    this.leadController = leadController;
+
+    this.routes = [
+      {
+        method: 'POST',
+        pattern: /^\/v1\/config\/stages\/([^/]+)\/sla$/,
+        handler: this.stageController.configureSla.bind(this.stageController),
+        getParams: (match) => ({ id: match[1] })
+      },
+      {
+        method: 'GET',
+        pattern: /^\/v1\/audit\/bottlenecks$/,
+        handler: this.auditController.getBottlenecks.bind(this.auditController),
+        getParams: () => ({})
+      },
+      {
+        method: 'GET',
+        pattern: /^\/v1\/audit\/conversion-latency$/,
+        handler: this.auditController.getConversionLatency.bind(this.auditController),
+        getParams: () => ({})
+      },
+      {
+        method: 'POST',
+        pattern: /^\/v1\/leads\/ingest$/,
+        handler: this.leadController.ingest.bind(this.leadController),
+        getParams: () => ({})
+      }
+    ];
+  }
+
+  async parseBody(req) {
+    return new Promise((resolve, reject) => {
+      let body = '';
+      const MAX_BODY_SIZE = 1 * 1024 * 1024; // 1MB
+
+      req.on('data', chunk => {
+        body += chunk.toString();
+        if (body.length > MAX_BODY_SIZE) {
+          reject(new Error('Payload too large'));
+          req.destroy();
+        }
+      });
+
+      req.on('end', () => {
+        if (!body) {
+          return resolve({});
+        }
+        try {
+          const contentType = req.headers['content-type'] || '';
+          if (contentType.includes('application/json')) {
+            return resolve(JSON.parse(body));
+          }
+          resolve({ raw: body });
+        } catch (err) {
+          reject(new Error('Invalid JSON body'));
+        }
+      });
+
+      req.on('error', err => reject(err));
+    });
   }
 
   async handleRequest(req, res) {
     try {
-      // TODO: Very basic body parser for demonstration
-      let body = '';
-      req.on('data', chunk => {
-        body += chunk.toString();
-      });
+      const parsedUrl = new URL(req.url, `http://${req.headers.host}`);
+      const pathname = parsedUrl.pathname;
 
-      req.on('end', async () => {
-        if (body) {
-          req.body = JSON.parse(body);
-        } else {
-          req.body = {};
-        }
+      req.query = Object.fromEntries(parsedUrl.searchParams.entries());
+      req.params = {};
 
-        const parsedUrl = new URL(req.url, `http://${req.headers.host}`);
-        const pathname = parsedUrl.pathname;
-        
-        req.query = Object.fromEntries(parsedUrl.searchParams);
+      if (req.method !== 'GET' && req.method !== 'HEAD') {
+        req.body = await this.parseBody(req);
+      } else {
+        req.body = {};
+      }
 
-        // TODO: Simple router
-        if (req.method === 'POST' && pathname.match(/^\/v1\/config\/stages\/(.+)\/sla$/)) {
-          const match = pathname.match(/^\/v1\/config\/stages\/(.+)\/sla$/);
-          req.params = { id: match[1] };
-          return this.stageController.configureSla(req, res);
-        } 
-        
-        if (req.method === 'GET' && pathname === '/v1/audit/bottlenecks') {
-          return this.auditController.getBottlenecks(req, res);
-        }
+      for (const route of this.routes) {
+        if (req.method !== route.method) continue;
+        const match = pathname.match(route.pattern);
+        if (!match) continue;
 
-        if (req.method === 'GET' && pathname === '/v1/audit/conversion-latency') {
-          return this.auditController.getConversionLatency(req, res);
-        }
+        req.params = route.getParams(match);
+        return route.handler(req, res);
+      }
 
-        res.statusCode = 404;
-        res.setHeader('Content-Type', 'text/plain');
-        res.end('Not Found');
-      });
+      res.statusCode = 404;
+      res.setHeader('Content-Type', 'application/json');
+      res.end(JSON.stringify({ error: 'Not Found' }));
 
     } catch (err) {
-      console.error(err);
+      console.error('Router error:', err.message);
+
+      if (err.message === 'Invalid JSON body') {
+        res.statusCode = 400;
+        res.setHeader('Content-Type', 'application/json');
+        return res.end(JSON.stringify({ error: 'Invalid JSON body' }));
+      }
+
+      if (err.message === 'Payload too large') {
+        res.statusCode = 413;
+        res.setHeader('Content-Type', 'application/json');
+        return res.end(JSON.stringify({ error: 'Payload too large' }));
+      }
+
       res.statusCode = 500;
-      res.end('Internal Server Error');
+      res.setHeader('Content-Type', 'application/json');
+      res.end(JSON.stringify({ error: 'Internal Server Error' }));
     }
   }
 }
