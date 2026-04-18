@@ -8,11 +8,14 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TenantContextInterceptor = void 0;
 const common_1 = require("@nestjs/common");
+const tenant_context_1 = require("../context/tenant.context");
 let TenantContextInterceptor = class TenantContextInterceptor {
     intercept(context, next) {
         const req = context.switchToHttp().getRequest();
-        if (req.user?.tenant_id) {
-            req.tenantId = req.user.tenant_id;
+        const tenantId = req.user?.tenant_id;
+        if (tenantId) {
+            req.tenantId = tenantId;
+            return tenant_context_1.tenantContext.run(tenantId, () => next.handle());
         }
         return next.handle();
     }

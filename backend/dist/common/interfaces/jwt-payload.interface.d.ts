@@ -1,7 +1,7 @@
 export interface JwtPayload {
     sub: number;
     tenant_id: number;
-    profile: 'director' | 'marketing_manager' | 'sales_rep';
+    profile: string;
     scopes: string[];
-    exp: number;
+    exp?: number;
 }

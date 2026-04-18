@@ -21,22 +21,22 @@ import type { TypeOrmModuleOptions } from '@nestjs/typeorm';
     // Load all config namespaces globally so every module can inject them
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [appConfig, databaseConfig, redisConfig],
+      load: [appConfig/*, databaseConfig*/, redisConfig],
     }),
 
     // TypeORM connected via ConfigService so credentials come from .env
-    TypeOrmModule.forRootAsync({
-      inject: [ConfigService],
-      useFactory: (config: ConfigService): TypeOrmModuleOptions =>
-        config.get<TypeOrmModuleOptions>('database') as TypeOrmModuleOptions,
-    }),
+    // TypeOrmModule.forRootAsync({
+    //   inject: [ConfigService],
+    //   useFactory: (config: ConfigService): TypeOrmModuleOptions =>
+    //     config.get<TypeOrmModuleOptions>('database') as TypeOrmModuleOptions,
+    // }),
 
     // Feature modules — each registers its own entities via forFeature()
-    AuthModule,
-    TenantsModule,
-    LeadsModule,
-    OpportunitiesModule,
-    AuditModule,
+    // AuthModule,
+    // TenantsModule,
+    // LeadsModule,
+    // OpportunitiesModule,
+    // AuditModule,
   ],
   controllers: [AppController],
   providers: [

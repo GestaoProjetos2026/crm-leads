@@ -15,6 +15,7 @@ let Tenant = class Tenant {
     id;
     name;
     plan;
+    isBlocked;
     createdAt;
 };
 exports.Tenant = Tenant;
@@ -30,6 +31,10 @@ __decorate([
     (0, typeorm_1.Column)({ default: 'starter', type: 'varchar' }),
     __metadata("design:type", String)
 ], Tenant.prototype, "plan", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ name: 'is_blocked', type: 'boolean', default: false }),
+    __metadata("design:type", Boolean)
+], Tenant.prototype, "isBlocked", void 0);
 __decorate([
     (0, typeorm_1.CreateDateColumn)({ name: 'created_at', type: 'date' }),
     __metadata("design:type", Date)

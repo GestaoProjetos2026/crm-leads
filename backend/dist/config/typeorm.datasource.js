@@ -46,6 +46,7 @@ const AppDataSource = new typeorm_1.DataSource({
     password: process.env.DB_PASSWORD ?? 'salesweakness',
     entities: ['src/**/*.entity.ts'],
     migrations: ['src/database/migrations/*.ts'],
+    subscribers: ['src/**/*.subscriber.ts'],
 });
 exports.default = AppDataSource;
 //# sourceMappingURL=typeorm.datasource.js.map
