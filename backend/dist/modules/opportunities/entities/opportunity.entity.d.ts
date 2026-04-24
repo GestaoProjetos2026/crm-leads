@@ -1,3 +1,5 @@
+import { Lead } from '../../leads/entities/lead.entity';
+import { Stage } from '../../stages/entities/stage.entity';
 export declare class Opportunity {
     id: number;
     tenantId: number;
@@ -10,4 +12,6 @@ export declare class Opportunity {
     expectedCloseDate: Date | null;
     createdAt: Date;
     updatedAt: Date;
+    lead: Lead;
+    stage: Stage;
 }

@@ -1,14 +1,65 @@
 import React, { useEffect, useState } from 'react';
 import { Routes, Route, Navigate, Link, useLocation, useNavigate } from 'react-router-dom';
+import BottlenecksPage from './pages/BottlenecksPage';
+import ConversionLatencyPage from './pages/ConversionLatencyPage';
+
+/**
+ * Credenciais de demonstração aceitas pelo sistema.
+ * Em produção, a autenticação é feita via JWT no backend.
+ */
+const DEMO_USERS: Record<string, { password: string; name: string; profile: string }> = {
+  'diretor@demo.com':  { password: 'admin123', name: 'Diretor Comercial', profile: 'director' },
+  'gestor@demo.com':   { password: 'admin123', name: 'Gestor de Tráfego', profile: 'marketing_manager' },
+  'vendedor@demo.com': { password: 'admin123', name: 'Vendedor (SDR)', profile: 'sales_rep' },
+};
 
 const LoginScreen = () => {
   const navigate = useNavigate();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    // O backend (NestJS + TypeORM) requer login, mas como o módulo está comentado,
-    // simulamos a autenticação redirecionando para o painel.
-    navigate('/dashboard');
+    setError('');
+    setLoading(true);
+
+    try {
+      // 1. Tenta autenticar no backend real (NestJS)
+      const response = await fetch('http://localhost:3000/v1/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        localStorage.setItem('sw_token', data.access_token);
+        localStorage.setItem('sw_user', JSON.stringify({ email }));
+        navigate('/dashboard');
+        return;
+      }
+    } catch {
+      // Backend indisponível — usa credenciais de demonstração
+    }
+
+    // 2. Fallback: valida com credenciais de demonstração
+    const demoUser = DEMO_USERS[email.toLowerCase()];
+    if (demoUser && password === demoUser.password) {
+      localStorage.setItem('sw_user', JSON.stringify({
+        email,
+        name: demoUser.name,
+        profile: demoUser.profile,
+      }));
+      setLoading(false);
+      navigate('/dashboard');
+      return;
+    }
+
+    // 3. Credenciais inválidas
+    setLoading(false);
+    setError('E-mail ou senha incorretos. Tente com as credenciais de demonstração.');
   };
 
   return (
@@ -19,6 +70,22 @@ const LoginScreen = () => {
           <p style={{ color: 'var(--text-secondary)' }}>Faça login para acessar seu painel.</p>
         </div>
 
+        {/* Error message */}
+        {error && (
+          <div style={{
+            background: 'rgba(239, 68, 68, 0.1)',
+            border: '1px solid rgba(239, 68, 68, 0.3)',
+            borderRadius: '8px',
+            padding: '0.75rem 1rem',
+            marginBottom: '1rem',
+            color: '#EF4444',
+            fontSize: '0.85rem',
+            textAlign: 'center',
+          }}>
+            {error}
+          </div>
+        )}
+
         <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           <div>
             <label htmlFor="email" style={{ display: 'block', color: 'var(--text-secondary)', marginBottom: '0.5rem', fontSize: '0.875rem' }}>
@@ -27,9 +94,11 @@ const LoginScreen = () => {
             <input 
               id="email"
               type="email" 
-              placeholder="diretor@empresa.com"
+              placeholder="diretor@demo.com"
               required
-              style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-primary)', color: 'var(--text-primary)', outline: 'none' }}
+              value={email}
+              onChange={(e) => { setEmail(e.target.value); setError(''); }}
+              style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: `1px solid ${error ? 'rgba(239, 68, 68, 0.5)' : 'var(--border-color)'}`, background: 'var(--bg-primary)', color: 'var(--text-primary)', outline: 'none', transition: 'border-color 0.2s' }}
             />
           </div>
 
@@ -42,7 +111,9 @@ const LoginScreen = () => {
               type="password" 
               placeholder="••••••••"
               required
-              style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-primary)', color: 'var(--text-primary)', outline: 'none' }}
+              value={password}
+              onChange={(e) => { setPassword(e.target.value); setError(''); }}
+              style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: `1px solid ${error ? 'rgba(239, 68, 68, 0.5)' : 'var(--border-color)'}`, background: 'var(--bg-primary)', color: 'var(--text-primary)', outline: 'none', transition: 'border-color 0.2s' }}
             />
           </div>
 
@@ -54,10 +125,36 @@ const LoginScreen = () => {
             <a href="#" style={{ color: 'var(--accent-primary)', fontSize: '0.875rem', textDecoration: 'none' }}>Esqueceu a senha?</a>
           </div>
 
-          <button type="submit" className="btn btn-primary" style={{ width: '100%', padding: '0.875rem', marginTop: '0.5rem', fontSize: '1rem' }}>
-            Entrar
+          <button
+            type="submit"
+            className="btn btn-primary"
+            disabled={loading}
+            style={{
+              width: '100%', padding: '0.875rem', marginTop: '0.5rem', fontSize: '1rem',
+              opacity: loading ? 0.7 : 1, cursor: loading ? 'wait' : 'pointer',
+            }}
+          >
+            {loading ? 'Entrando...' : 'Entrar'}
           </button>
         </form>
+
+        {/* Demo credentials hint */}
+        <div style={{
+          marginTop: '1.5rem',
+          padding: '0.875rem',
+          borderRadius: '8px',
+          background: 'rgba(59, 130, 246, 0.08)',
+          border: '1px solid rgba(59, 130, 246, 0.2)',
+        }}>
+          <p style={{ color: 'var(--accent-primary)', fontSize: '0.75rem', fontWeight: 600, marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            🔑 Credenciais de Demonstração
+          </p>
+          <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+            <div><strong style={{ color: 'var(--text-primary)' }}>diretor@demo.com</strong> · senha: admin123</div>
+            <div><strong style={{ color: 'var(--text-primary)' }}>gestor@demo.com</strong> · senha: admin123</div>
+            <div><strong style={{ color: 'var(--text-primary)' }}>vendedor@demo.com</strong> · senha: admin123</div>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -67,33 +164,33 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation();
   
   const navItems = [
-    { path: '/dashboard', label: 'Painel' },
-    { path: '/leads', label: 'Leads (Mock)' },
-    { path: '/settings', label: 'Configurações' },
+    { path: '/dashboard', label: 'Painel', icon: '📊' },
+    { path: '/bottlenecks', label: 'Gargalos', icon: '🚨' },
+    { path: '/conversion-latency', label: 'Latência', icon: '⏱️' },
+    { path: '/settings', label: 'Configurações', icon: '⚙️' },
   ];
 
   return (
     <div className="app-container">
-      <aside className="glass-panel" style={{ width: '250px', borderRight: '1px solid var(--border-color)', borderRadius: 0 }}>
-        <div style={{ padding: 'var(--spacing-lg)' }}>
-          <h3 style={{ color: 'var(--text-primary)' }}>SalesWeakness</h3>
+      <aside className="sidebar glass-panel">
+        <div className="sidebar-header">
+          <div className="sidebar-logo">
+            <span className="logo-icon">🎯</span>
+            <h3 className="logo-text">SalesWeakness</h3>
+          </div>
+          <span className="version-badge">Sprint 4</span>
         </div>
-        <nav style={{ padding: 'var(--spacing-md)' }}>
+        <nav className="sidebar-nav">
           <ul style={{ listStyle: 'none' }}>
             {navItems.map(item => {
-              const isActive = location.pathname.startsWith(item.path);
+              const isActive = location.pathname === item.path;
               return (
-                <li key={item.path} style={{ padding: 'var(--spacing-sm) 0' }}>
+                <li key={item.path}>
                   <Link 
                     to={item.path} 
-                    style={{ 
-                      textDecoration: 'none', 
-                      color: isActive ? 'var(--accent-primary)' : 'var(--text-secondary)',
-                      fontWeight: isActive ? 'bold' : 'normal',
-                      display: 'block',
-                      transition: 'color var(--transition-fast)'
-                    }}
+                    className={`nav-link ${isActive ? 'nav-link-active' : ''}`}
                   >
+                    <span className="nav-icon">{item.icon}</span>
                     {item.label}
                   </Link>
                 </li>
@@ -101,6 +198,12 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
             })}
           </ul>
         </nav>
+        <div className="sidebar-footer">
+          <Link to="/login" className="nav-link" style={{ color: 'var(--danger)' }}>
+            <span className="nav-icon">🚪</span>
+            Sair
+          </Link>
+        </div>
       </aside>
       <main className="main-content">
         {children}
@@ -109,24 +212,72 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-const DashboardPlaceholder = () => (
+const DashboardOverview = () => (
   <MainLayout>
-    <header style={{ marginBottom: 'var(--spacing-xl)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-      <h2 style={{ color: 'var(--text-primary)' }}>Visão Geral</h2>
+    <header className="page-header">
+      <div>
+        <h2 className="page-title">
+          <span className="title-icon">📊</span>
+          Visão Geral
+        </h2>
+        <p className="page-subtitle">Dashboard do Diretor Comercial — Sprint 4: Motor de Gargalos</p>
+      </div>
       <div style={{ display: 'flex', gap: '1rem' }}>
          <button className="btn btn-secondary hover-lift">Exportar CSV</button>
          <button className="btn btn-primary hover-lift">Nova Oportunidade</button>
       </div>
     </header>
     
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 'var(--spacing-lg)' }}>
-      {/* KPI Cards */}
-      {[1, 2, 3].map(i => (
-        <div key={i} className="glass-panel hover-lift" style={{ padding: 'var(--spacing-lg)' }}>
-          <h4 style={{ color: 'var(--text-secondary)', marginBottom: 'var(--spacing-xs)' }}>Métrica {i}</h4>
-          <div style={{ fontSize: '2rem', fontWeight: 'bold', color: 'var(--text-primary)' }}>R$ 45.000</div>
+    <div className="kpi-grid">
+      <div className="kpi-card kpi-info">
+        <div className="kpi-icon">🎯</div>
+        <div className="kpi-content">
+          <span className="kpi-label">Leads Ativos</span>
+          <span className="kpi-value">5</span>
         </div>
-      ))}
+      </div>
+
+      <div className="kpi-card kpi-danger">
+        <div className="kpi-icon">💰</div>
+        <div className="kpi-content">
+          <span className="kpi-label">Valor em Risco</span>
+          <span className="kpi-value">R$ 210.000</span>
+        </div>
+        <div className="kpi-pulse"></div>
+      </div>
+
+      <div className="kpi-card kpi-warning">
+        <div className="kpi-icon">⚠️</div>
+        <div className="kpi-content">
+          <span className="kpi-label">Gargalos Ativos</span>
+          <span className="kpi-value">4</span>
+        </div>
+      </div>
+    </div>
+
+    {/* Quick Links */}
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 'var(--spacing-lg)', marginTop: 'var(--spacing-xl)' }}>
+      <Link to="/bottlenecks" className="quick-link-card glass-panel hover-lift">
+        <div className="quick-link-icon">🚨</div>
+        <div>
+          <h4 style={{ color: 'var(--text-primary)', marginBottom: '0.25rem' }}>Gargalos Detectados</h4>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
+            Veja leads parados além do SLA e o valor em risco de cada oportunidade estagnada.
+          </p>
+        </div>
+        <span className="quick-link-arrow">→</span>
+      </Link>
+
+      <Link to="/conversion-latency" className="quick-link-card glass-panel hover-lift">
+        <div className="quick-link-icon">⏱️</div>
+        <div>
+          <h4 style={{ color: 'var(--text-primary)', marginBottom: '0.25rem' }}>Latência de Conversão</h4>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
+            Analise o tempo médio em cada etapa do funil e identifique onde sua equipe está perdendo dinheiro.
+          </p>
+        </div>
+        <span className="quick-link-arrow">→</span>
+      </Link>
     </div>
   </MainLayout>
 );
@@ -138,8 +289,11 @@ const SettingsPlaceholder = ({
 }: any) => (
   <MainLayout>
     <header style={{ marginBottom: 'var(--spacing-xl)' }}>
-      <h2 style={{ color: 'var(--text-primary)', marginBottom: 'var(--spacing-xs)' }}>Configurações</h2>
-      <p style={{ color: 'var(--text-secondary)' }}>Gerencie as preferências da empresa, aparência e integrações.</p>
+      <h2 className="page-title" style={{ marginBottom: 'var(--spacing-xs)' }}>
+        <span className="title-icon">⚙️</span>
+        Configurações
+      </h2>
+      <p className="page-subtitle">Gerencie as preferências da empresa, aparência e integrações.</p>
     </header>
 
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-xl)', maxWidth: '800px' }}>
@@ -233,22 +387,14 @@ const SettingsPlaceholder = ({
             <input 
               type="text" 
               readOnly 
-              value="https://api.salesweakness.com/v1/leads/ingest?tenant=42"
+              value="http://localhost:3000/v1/leads/ingest?tenantId=1"
               style={{ flex: 1, padding: 'var(--spacing-sm)', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-primary)', color: 'var(--text-secondary)' }}
             />
             <button className="btn btn-secondary">Copiar</button>
           </div>
-        </div>
-
-        <div>
-          <label style={{ display: 'block', color: 'var(--text-secondary)', marginBottom: 'var(--spacing-xs)', fontSize: '0.875rem' }}>
-            API Key do WhatsApp (Disparo de Reativação)
-          </label>
-          <input 
-            type="password" 
-            defaultValue="sk_test_whatsapp_12345"
-            style={{ width: '100%', padding: 'var(--spacing-sm)', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-primary)', color: 'var(--text-primary)' }}
-          />
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.75rem', marginTop: '0.5rem' }}>
+            Header obrigatório: <code style={{ color: 'var(--accent-primary)' }}>x-api-key: sw-dev-api-key-2026</code>
+          </p>
         </div>
       </section>
 
@@ -277,7 +423,9 @@ function App() {
     <>
       <Routes>
         <Route path="/login" element={<LoginScreen />} />
-        <Route path="/dashboard" element={<DashboardPlaceholder />} />
+        <Route path="/dashboard" element={<DashboardOverview />} />
+        <Route path="/bottlenecks" element={<MainLayout><BottlenecksPage /></MainLayout>} />
+        <Route path="/conversion-latency" element={<MainLayout><ConversionLatencyPage /></MainLayout>} />
         <Route 
           path="/settings" 
           element={

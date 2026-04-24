@@ -4,7 +4,11 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm';
+import { Lead } from '../../leads/entities/lead.entity';
+import { Stage } from '../../stages/entities/stage.entity';
 
 /**
  * Opportunity entity — represents a sales opportunity in the pipeline.
@@ -47,13 +51,24 @@ export class Opportunity {
   @Column({ name: 'expected_close_date', type: 'date', nullable: true })
   expectedCloseDate!: Date | null;
 
-  @CreateDateColumn({ name: 'created_at', type: 'date' })
+  @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
   createdAt!: Date;
 
   /**
    * CRITICAL: Monitored by stagnation Worker to detect 48h inactivity.
    * Updated by TypeORM on every save — resets the 48h counter.
+   * Changed from 'date' to 'timestamp' for hour-level precision.
    */
-  @UpdateDateColumn({ name: 'updated_at', type: 'date' })
+  @UpdateDateColumn({ name: 'updated_at', type: 'timestamp' })
   updatedAt!: Date;
+
+  /* ── Relations ── */
+
+  @ManyToOne(() => Lead, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'lead_id' })
+  lead!: Lead;
+
+  @ManyToOne(() => Stage)
+  @JoinColumn({ name: 'stage_id' })
+  stage!: Stage;
 }

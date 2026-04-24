@@ -1,3 +1,4 @@
+import { Campaign } from '../../campaigns/entities/campaign.entity';
 export declare class Lead {
     id: number;
     tenantId: number;
@@ -9,4 +10,5 @@ export declare class Lead {
     isInactive: boolean;
     createdAt: Date;
     updatedAt: Date;
+    campaign: Campaign | null;
 }

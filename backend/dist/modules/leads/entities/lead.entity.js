@@ -11,6 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Lead = void 0;
 const typeorm_1 = require("typeorm");
+const campaign_entity_1 = require("../../campaigns/entities/campaign.entity");
 let Lead = class Lead {
     id;
     tenantId;
@@ -22,6 +23,7 @@ let Lead = class Lead {
     isInactive;
     createdAt;
     updatedAt;
+    campaign;
 };
 exports.Lead = Lead;
 __decorate([
@@ -57,13 +59,18 @@ __decorate([
     __metadata("design:type", Boolean)
 ], Lead.prototype, "isInactive", void 0);
 __decorate([
-    (0, typeorm_1.CreateDateColumn)({ name: 'created_at', type: 'date' }),
+    (0, typeorm_1.CreateDateColumn)({ name: 'created_at', type: 'timestamp' }),
     __metadata("design:type", Date)
 ], Lead.prototype, "createdAt", void 0);
 __decorate([
-    (0, typeorm_1.UpdateDateColumn)({ name: 'updated_at', type: 'date' }),
+    (0, typeorm_1.UpdateDateColumn)({ name: 'updated_at', type: 'timestamp' }),
     __metadata("design:type", Date)
 ], Lead.prototype, "updatedAt", void 0);
+__decorate([
+    (0, typeorm_1.ManyToOne)(() => campaign_entity_1.Campaign, { nullable: true }),
+    (0, typeorm_1.JoinColumn)({ name: 'campaign_id' }),
+    __metadata("design:type", Object)
+], Lead.prototype, "campaign", void 0);
 exports.Lead = Lead = __decorate([
     (0, typeorm_1.Entity)('leads')
 ], Lead);

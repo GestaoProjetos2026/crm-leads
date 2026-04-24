@@ -4,7 +4,10 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm';
+import { Campaign } from '../../campaigns/entities/campaign.entity';
 
 /**
  * Lead entity — represents a prospect entering the CRM pipeline.
@@ -38,10 +41,16 @@ export class Lead {
   @Column({ name: 'is_inactive', type: 'bool', default: false })
   isInactive!: boolean;
 
-  @CreateDateColumn({ name: 'created_at', type: 'date' })
+  @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
   createdAt!: Date;
 
   /** Monitored by inactivity Worker for 180d threshold */
-  @UpdateDateColumn({ name: 'updated_at', type: 'date' })
+  @UpdateDateColumn({ name: 'updated_at', type: 'timestamp' })
   updatedAt!: Date;
+
+  /* ── Relations ── */
+
+  @ManyToOne(() => Campaign, { nullable: true })
+  @JoinColumn({ name: 'campaign_id' })
+  campaign!: Campaign | null;
 }

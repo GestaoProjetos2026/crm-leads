@@ -1,11 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { INestApplication } from '@nestjs/common';
 import { AppModule } from './../src/app.module';
 import { DataSource } from 'typeorm';
 import { tenantContext } from '../src/common/context/tenant.context';
 
 describe('Integração de Segurança: Isolamento Multi-tenant (RLS)', () => {
   let dataSource: DataSource;
-  let app;
+  let app: INestApplication;
 
   beforeAll(async () => {
     // Sobe o módulo principal da aplicação para conectar no banco

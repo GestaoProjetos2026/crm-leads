@@ -14,6 +14,9 @@ import { TenantsModule } from './modules/tenants/tenants.module';
 import { LeadsModule } from './modules/leads/leads.module';
 import { OpportunitiesModule } from './modules/opportunities/opportunities.module';
 import { AuditModule } from './modules/audit/audit.module';
+import { StagesModule } from './modules/stages/stages.module';
+import { CampaignsModule } from './modules/campaigns/campaigns.module';
+import { WorkerModule } from './modules/worker/worker.module';
 import type { TypeOrmModuleOptions } from '@nestjs/typeorm';
 
 @Module({
@@ -21,22 +24,27 @@ import type { TypeOrmModuleOptions } from '@nestjs/typeorm';
     // Load all config namespaces globally so every module can inject them
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [appConfig/*, databaseConfig*/, redisConfig],
+      load: [appConfig, databaseConfig, redisConfig],
     }),
 
     // TypeORM connected via ConfigService so credentials come from .env
-    // TypeOrmModule.forRootAsync({
-    //   inject: [ConfigService],
-    //   useFactory: (config: ConfigService): TypeOrmModuleOptions =>
-    //     config.get<TypeOrmModuleOptions>('database') as TypeOrmModuleOptions,
-    // }),
+    TypeOrmModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (config: ConfigService): TypeOrmModuleOptions =>
+        config.get<TypeOrmModuleOptions>('database') as TypeOrmModuleOptions,
+    }),
 
     // Feature modules — each registers its own entities via forFeature()
-    // AuthModule,
-    // TenantsModule,
-    // LeadsModule,
-    // OpportunitiesModule,
-    // AuditModule,
+    AuthModule,
+    TenantsModule,
+    LeadsModule,
+    OpportunitiesModule,
+    AuditModule,
+    StagesModule,
+    CampaignsModule,
+
+    // Background workers (StagnationWorker with @Cron)
+    WorkerModule,
   ],
   controllers: [AppController],
   providers: [

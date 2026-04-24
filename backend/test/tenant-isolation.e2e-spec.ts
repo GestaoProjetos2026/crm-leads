@@ -1,10 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { INestApplication } from '@nestjs/common';
 import { AppModule } from './../src/app.module';
 import { DataSource } from 'typeorm';
 
 describe('Integração de Segurança: Isolamento Multi-tenant (RLS)', () => {
   let dataSource: DataSource;
-  let app;
+  let app: INestApplication;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({

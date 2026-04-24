@@ -11,6 +11,8 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Opportunity = void 0;
 const typeorm_1 = require("typeorm");
+const lead_entity_1 = require("../../leads/entities/lead.entity");
+const stage_entity_1 = require("../../stages/entities/stage.entity");
 let Opportunity = class Opportunity {
     id;
     tenantId;
@@ -23,6 +25,8 @@ let Opportunity = class Opportunity {
     expectedCloseDate;
     createdAt;
     updatedAt;
+    lead;
+    stage;
 };
 exports.Opportunity = Opportunity;
 __decorate([
@@ -62,13 +66,23 @@ __decorate([
     __metadata("design:type", Object)
 ], Opportunity.prototype, "expectedCloseDate", void 0);
 __decorate([
-    (0, typeorm_1.CreateDateColumn)({ name: 'created_at', type: 'date' }),
+    (0, typeorm_1.CreateDateColumn)({ name: 'created_at', type: 'timestamp' }),
     __metadata("design:type", Date)
 ], Opportunity.prototype, "createdAt", void 0);
 __decorate([
-    (0, typeorm_1.UpdateDateColumn)({ name: 'updated_at', type: 'date' }),
+    (0, typeorm_1.UpdateDateColumn)({ name: 'updated_at', type: 'timestamp' }),
     __metadata("design:type", Date)
 ], Opportunity.prototype, "updatedAt", void 0);
+__decorate([
+    (0, typeorm_1.ManyToOne)(() => lead_entity_1.Lead, { onDelete: 'CASCADE' }),
+    (0, typeorm_1.JoinColumn)({ name: 'lead_id' }),
+    __metadata("design:type", lead_entity_1.Lead)
+], Opportunity.prototype, "lead", void 0);
+__decorate([
+    (0, typeorm_1.ManyToOne)(() => stage_entity_1.Stage),
+    (0, typeorm_1.JoinColumn)({ name: 'stage_id' }),
+    __metadata("design:type", stage_entity_1.Stage)
+], Opportunity.prototype, "stage", void 0);
 exports.Opportunity = Opportunity = __decorate([
     (0, typeorm_1.Entity)('opportunities')
 ], Opportunity);
