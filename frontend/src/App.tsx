@@ -2,14 +2,15 @@ import React, { useEffect, useState } from 'react';
 import { Routes, Route, Navigate, Link, useLocation, useNavigate } from 'react-router-dom';
 import BottlenecksPage from './pages/BottlenecksPage';
 import ConversionLatencyPage from './pages/ConversionLatencyPage';
+import logo from './assets/logo.svg';
 
 /**
  * Credenciais de demonstração aceitas pelo sistema.
  * Em produção, a autenticação é feita via JWT no backend.
  */
 const DEMO_USERS: Record<string, { password: string; name: string; profile: string }> = {
-  'diretor@demo.com':  { password: 'admin123', name: 'Diretor Comercial', profile: 'director' },
-  'gestor@demo.com':   { password: 'admin123', name: 'Gestor de Tráfego', profile: 'marketing_manager' },
+  'diretor@demo.com': { password: 'admin123', name: 'Diretor Comercial', profile: 'director' },
+  'gestor@demo.com': { password: 'admin123', name: 'Gestor de Tráfego', profile: 'marketing_manager' },
   'vendedor@demo.com': { password: 'admin123', name: 'Vendedor (SDR)', profile: 'sales_rep' },
 };
 
@@ -66,7 +67,7 @@ const LoginScreen = () => {
     <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-primary)' }}>
       <div className="glass-panel" style={{ padding: '3rem 2rem', width: '100%', maxWidth: '420px', borderRadius: '16px' }}>
         <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-          <h2 style={{ color: 'var(--text-primary)', fontSize: '1.75rem', marginBottom: '0.5rem' }}>SalesWeakness</h2>
+          <img src={logo} alt="SalesWeakness Logo" style={{ width: '250px' }} />
           <p style={{ color: 'var(--text-secondary)' }}>Faça login para acessar seu painel.</p>
         </div>
 
@@ -91,9 +92,9 @@ const LoginScreen = () => {
             <label htmlFor="email" style={{ display: 'block', color: 'var(--text-secondary)', marginBottom: '0.5rem', fontSize: '0.875rem' }}>
               E-mail Profissional
             </label>
-            <input 
+            <input
               id="email"
-              type="email" 
+              type="email"
               placeholder="diretor@demo.com"
               required
               value={email}
@@ -106,9 +107,9 @@ const LoginScreen = () => {
             <label htmlFor="password" style={{ display: 'block', color: 'var(--text-secondary)', marginBottom: '0.5rem', fontSize: '0.875rem' }}>
               Senha
             </label>
-            <input 
+            <input
               id="password"
-              type="password" 
+              type="password"
               placeholder="••••••••"
               required
               value={password}
@@ -162,9 +163,10 @@ const LoginScreen = () => {
 
 const MainLayout = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation();
-  
+
   const navItems = [
     { path: '/dashboard', label: 'Painel', icon: '📊' },
+    { path: '/leads', label: 'Leads', icon: '👥' },
     { path: '/bottlenecks', label: 'Gargalos', icon: '🚨' },
     { path: '/conversion-latency', label: 'Latência', icon: '⏱️' },
     { path: '/settings', label: 'Configurações', icon: '⚙️' },
@@ -175,8 +177,7 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
       <aside className="sidebar glass-panel">
         <div className="sidebar-header">
           <div className="sidebar-logo">
-            <span className="logo-icon">🎯</span>
-            <h3 className="logo-text">SalesWeakness</h3>
+            <img src={logo} alt="SalesWeakness Logo" style={{ width: '180px' }} />
           </div>
           <span className="version-badge">Sprint 4</span>
         </div>
@@ -186,8 +187,8 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
               const isActive = location.pathname === item.path;
               return (
                 <li key={item.path}>
-                  <Link 
-                    to={item.path} 
+                  <Link
+                    to={item.path}
                     className={`nav-link ${isActive ? 'nav-link-active' : ''}`}
                   >
                     <span className="nav-icon">{item.icon}</span>
@@ -223,11 +224,11 @@ const DashboardOverview = () => (
         <p className="page-subtitle">Dashboard do Diretor Comercial — Sprint 4: Motor de Gargalos</p>
       </div>
       <div style={{ display: 'flex', gap: '1rem' }}>
-         <button className="btn btn-secondary hover-lift">Exportar CSV</button>
-         <button className="btn btn-primary hover-lift">Nova Oportunidade</button>
+        <button className="btn btn-secondary hover-lift">Exportar CSV</button>
+        <button className="btn btn-primary hover-lift">Nova Oportunidade</button>
       </div>
     </header>
-    
+
     <div className="kpi-grid">
       <div className="kpi-card kpi-info">
         <div className="kpi-icon">🎯</div>
@@ -282,10 +283,11 @@ const DashboardOverview = () => (
   </MainLayout>
 );
 
-const SettingsPlaceholder = ({ 
-  theme, setTheme, 
-  accentColor, setAccentColor, 
-  fontSize, setFontSize 
+const SettingsPlaceholder = ({
+  theme, setTheme,
+  accentColor, setAccentColor,
+  fontSize, setFontSize,
+  leadsViewMode, setLeadsViewMode
 }: any) => (
   <MainLayout>
     <header style={{ marginBottom: 'var(--spacing-xl)' }}>
@@ -297,31 +299,31 @@ const SettingsPlaceholder = ({
     </header>
 
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-xl)', maxWidth: '800px' }}>
-      
+
       {/* Section 1: Aparência */}
       <section className="glass-panel" style={{ padding: 'var(--spacing-lg)' }}>
         <h3 style={{ color: 'var(--text-primary)', borderBottom: '1px solid var(--border-color)', paddingBottom: 'var(--spacing-sm)', marginBottom: 'var(--spacing-lg)' }}>
           Aparência e Personalização
         </h3>
-        
+
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--spacing-lg)' }}>
           <div>
             <label style={{ display: 'block', color: 'var(--text-secondary)', marginBottom: 'var(--spacing-xs)', fontSize: '0.875rem' }}>Tema Padrão</label>
-            <select 
-              value={theme} 
-              onChange={(e) => setTheme(e.target.value)} 
+            <select
+              value={theme}
+              onChange={(e) => setTheme(e.target.value)}
               style={{ width: '100%', padding: 'var(--spacing-sm)', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-primary)', color: 'var(--text-primary)', outline: 'none' }}
             >
               <option value="dark">Modo Escuro (Dark)</option>
               <option value="light">Modo Claro (Light)</option>
             </select>
           </div>
-          
+
           <div>
             <label style={{ display: 'block', color: 'var(--text-secondary)', marginBottom: 'var(--spacing-xs)', fontSize: '0.875rem' }}>Tamanho da Fonte</label>
-            <select 
-              value={fontSize} 
-              onChange={(e) => setFontSize(e.target.value)} 
+            <select
+              value={fontSize}
+              onChange={(e) => setFontSize(e.target.value)}
               style={{ width: '100%', padding: 'var(--spacing-sm)', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-primary)', color: 'var(--text-primary)', outline: 'none' }}
             >
               <option value="14px">Pequeno (Mais espaço)</option>
@@ -334,11 +336,11 @@ const SettingsPlaceholder = ({
             <label style={{ display: 'block', color: 'var(--text-secondary)', marginBottom: 'var(--spacing-sm)', fontSize: '0.875rem' }}>Cor de Destaque</label>
             <div style={{ display: 'flex', gap: '0.75rem' }}>
               {['#3B82F6', '#10B981', '#8B5CF6', '#F43F5E', '#F59E0B'].map(color => (
-                <button 
+                <button
                   key={color}
                   onClick={() => setAccentColor(color)}
-                  style={{ 
-                    width: '32px', height: '32px', borderRadius: '50%', backgroundColor: color, 
+                  style={{
+                    width: '32px', height: '32px', borderRadius: '50%', backgroundColor: color,
                     border: accentColor === color ? '3px solid var(--text-primary)' : '2px solid transparent',
                     cursor: 'pointer',
                     boxShadow: accentColor === color ? '0 0 10px rgba(0,0,0,0.2)' : 'none',
@@ -349,6 +351,18 @@ const SettingsPlaceholder = ({
               ))}
             </div>
           </div>
+
+          <div>
+            <label style={{ display: 'block', color: 'var(--text-secondary)', marginBottom: 'var(--spacing-xs)', fontSize: '0.875rem' }}>Visualização de Leads</label>
+            <select
+              value={leadsViewMode}
+              onChange={(e) => setLeadsViewMode(e.target.value)}
+              style={{ width: '100%', padding: 'var(--spacing-sm)', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-primary)', color: 'var(--text-primary)', outline: 'none' }}
+            >
+              <option value="table">Tabela (Lista)</option>
+              <option value="grid">Cards (Grade)</option>
+            </select>
+          </div>
         </div>
       </section>
 
@@ -357,14 +371,14 @@ const SettingsPlaceholder = ({
         <h3 style={{ color: 'var(--text-primary)', borderBottom: '1px solid var(--border-color)', paddingBottom: 'var(--spacing-sm)', marginBottom: 'var(--spacing-lg)' }}>
           Regras de SLA e Estagnação
         </h3>
-        
+
         <div style={{ marginBottom: 'var(--spacing-md)' }}>
           <label style={{ display: 'block', color: 'var(--text-secondary)', marginBottom: 'var(--spacing-xs)', fontSize: '0.875rem' }}>
             Tempo de Estagnação de Lead (Horas)
           </label>
           <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-            <input 
-              type="number" 
+            <input
+              type="number"
               defaultValue={48}
               style={{ padding: 'var(--spacing-sm)', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-primary)', color: 'var(--text-primary)', width: '100px' }}
             />
@@ -384,10 +398,10 @@ const SettingsPlaceholder = ({
             URL de Ingestão de Leads (Webhook)
           </label>
           <div style={{ display: 'flex', gap: '1rem' }}>
-            <input 
-              type="text" 
-              readOnly 
-              value="http://localhost:3000/v1/leads/ingest?tenantId=1"
+            <input
+              type="text"
+              readOnly
+              value="https://api.salesweakness.com/v1/leads/ingest?tenant=42"
               style={{ flex: 1, padding: 'var(--spacing-sm)', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-primary)', color: 'var(--text-secondary)' }}
             />
             <button className="btn btn-secondary">Copiar</button>
@@ -395,6 +409,17 @@ const SettingsPlaceholder = ({
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.75rem', marginTop: '0.5rem' }}>
             Header obrigatório: <code style={{ color: 'var(--accent-primary)' }}>x-api-key: sw-dev-api-key-2026</code>
           </p>
+        </div>
+
+        <div>
+          <label style={{ display: 'block', color: 'var(--text-secondary)', marginBottom: 'var(--spacing-xs)', fontSize: '0.875rem' }}>
+            API Key do WhatsApp (Disparo de Reativação)
+          </label>
+          <input
+            type="password"
+            defaultValue="sk_test_whatsapp_12345"
+            style={{ width: '100%', padding: 'var(--spacing-sm)', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-primary)', color: 'var(--text-primary)' }}
+          />
         </div>
       </section>
 
@@ -408,10 +433,177 @@ const SettingsPlaceholder = ({
   </MainLayout>
 );
 
+const mockLeads = [
+  { id: 1, firstName: 'João', lastName: 'Silva', email: 'joao.silva@empresa.com', source: 'facebook_leads', isInactive: false, createdAt: new Date('2026-04-20T10:00:00') },
+  { id: 2, firstName: 'Maria', lastName: 'Oliveira', email: 'maria.oliveira@startup.io', source: 'landing_page', isInactive: false, createdAt: new Date('2026-04-21T14:30:00') },
+  { id: 3, firstName: 'Carlos', lastName: 'Souza', email: 'carlos.souza@gmail.com', source: 'organic', isInactive: true, createdAt: new Date('2025-10-15T09:15:00') },
+  { id: 4, firstName: 'Ana', lastName: 'Costa', email: 'ana.costa@techsol.com', source: 'linkedin_ads', isInactive: false, createdAt: new Date('2026-04-23T11:45:00') },
+  { id: 5, firstName: 'Pedro', lastName: 'Almeida', email: 'pedro.almeida@hotmail.com', source: 'facebook_leads', isInactive: true, createdAt: new Date('2025-08-05T16:20:00') },
+  { id: 6, firstName: 'Anna', lastName: 'Nunes', email: 'annanunesc04@gmail.com', source: 'organic', isInactive: true, createdAt: new Date('2025-08-05T16:20:00') },
+
+];
+
+const LeadsScreen = ({ viewMode }: { viewMode: string }) => {
+  const [showFilters, setShowFilters] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [sourceFilter, setSourceFilter] = useState('all');
+
+  const filteredLeads = mockLeads.filter(lead => {
+    const matchesSearch =
+      `${lead.firstName} ${lead.lastName}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      lead.email.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesStatus =
+      statusFilter === 'all' ? true :
+        statusFilter === 'active' ? !lead.isInactive :
+          statusFilter === 'inactive' ? lead.isInactive : true;
+
+    const matchesSource = sourceFilter === 'all' ? true : lead.source === sourceFilter;
+
+    return matchesSearch && matchesStatus && matchesSource;
+  });
+
+  return (
+    <MainLayout>
+      <header style={{ marginBottom: 'var(--spacing-md)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div>
+          <h2 style={{ color: 'var(--text-primary)', marginBottom: 'var(--spacing-xs)' }}>Leads</h2>
+          <p style={{ color: 'var(--text-secondary)' }}>Gerencie e acompanhe seus contatos comerciais.</p>
+        </div>
+        <div style={{ display: 'flex', gap: '1rem' }}>
+          <button
+            className={`btn ${showFilters ? 'btn-primary' : 'btn-secondary'} hover-lift`}
+            onClick={() => setShowFilters(!showFilters)}
+          >
+            {showFilters ? 'Ocultar Filtros' : 'Filtrar'}
+          </button>
+          <button className="btn btn-primary hover-lift">Novo Lead</button>
+        </div>
+      </header>
+
+      {showFilters && (
+        <div className="glass-panel" style={{ padding: 'var(--spacing-md)', marginBottom: 'var(--spacing-lg)', display: 'flex', gap: 'var(--spacing-md)', flexWrap: 'wrap', alignItems: 'center' }}>
+          <div style={{ flex: '1 1 250px' }}>
+            <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>Buscar</label>
+            <input
+              type="text"
+              placeholder="Nome ou e-mail..."
+              value={searchTerm}
+              onChange={e => setSearchTerm(e.target.value)}
+              style={{ width: '100%', padding: '0.5rem', borderRadius: '6px', border: '1px solid var(--border-color)', background: 'var(--bg-primary)', color: 'var(--text-primary)', outline: 'none' }}
+            />
+          </div>
+          <div style={{ flex: '1 1 150px' }}>
+            <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>Status</label>
+            <select
+              value={statusFilter}
+              onChange={e => setStatusFilter(e.target.value)}
+              style={{ width: '100%', padding: '0.5rem', borderRadius: '6px', border: '1px solid var(--border-color)', background: 'var(--bg-primary)', color: 'var(--text-primary)', outline: 'none' }}
+            >
+              <option value="all">Todos</option>
+              <option value="active">Ativos</option>
+              <option value="inactive">Inativos</option>
+            </select>
+          </div>
+          <div style={{ flex: '1 1 150px' }}>
+            <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>Origem</label>
+            <select
+              value={sourceFilter}
+              onChange={e => setSourceFilter(e.target.value)}
+              style={{ width: '100%', padding: '0.5rem', borderRadius: '6px', border: '1px solid var(--border-color)', background: 'var(--bg-primary)', color: 'var(--text-primary)', outline: 'none' }}
+            >
+              <option value="all">Todas</option>
+              <option value="facebook_leads">Facebook Leads</option>
+              <option value="landing_page">Landing Page</option>
+              <option value="organic">Orgânico</option>
+              <option value="linkedin_ads">LinkedIn Ads</option>
+            </select>
+          </div>
+        </div>
+      )}
+
+      {viewMode === 'table' ? (
+        <div className="glass-panel data-table-container">
+          <table className="data-table">
+            <thead>
+              <tr>
+                <th>Nome</th>
+                <th>E-mail</th>
+                <th>Origem</th>
+                <th>Data de Entrada</th>
+                <th>Status</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredLeads.map((lead) => (
+                <tr key={lead.id}>
+                  <td>
+                    <div style={{ fontWeight: 500, color: 'var(--text-primary)' }}>{lead.firstName} {lead.lastName}</div>
+                  </td>
+                  <td>{lead.email}</td>
+                  <td>
+                    <span style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>{lead.source}</span>
+                  </td>
+                  <td>
+                    <span style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
+                      {lead.createdAt.toLocaleDateString('pt-BR')}
+                    </span>
+                  </td>
+                  <td>
+                    {lead.isInactive ? (
+                      <span className="badge badge-warning">Inativo</span>
+                    ) : (
+                      <span className="badge badge-success">Ativo</span>
+                    )}
+                  </td>
+                  <td>
+                    <button className="btn btn-secondary" style={{ padding: '0.25rem 0.5rem', fontSize: '0.875rem' }}>Ver</button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <div className="leads-grid">
+          {filteredLeads.map((lead) => (
+            <div key={lead.id} className="glass-panel lead-card hover-lift">
+              <div className="lead-card-header">
+                <div>
+                  <div className="lead-card-title">{lead.firstName} {lead.lastName}</div>
+                  <div className="lead-card-subtitle">{lead.email}</div>
+                </div>
+                {lead.isInactive ? (
+                  <span className="badge badge-warning">Inativo</span>
+                ) : (
+                  <span className="badge badge-success">Ativo</span>
+                )}
+              </div>
+              <div style={{ padding: 'var(--spacing-sm) 0' }}>
+                <span style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                  {lead.source}
+                </span>
+              </div>
+              <div className="lead-card-footer">
+                <span>Criado em {lead.createdAt.toLocaleDateString('pt-BR')}</span>
+                <button className="btn btn-secondary" style={{ padding: '0.25rem 0.5rem', fontSize: '0.875rem' }}>Abrir</button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </MainLayout>
+  );
+};
+
 function App() {
   const [theme, setTheme] = useState('dark');
   const [accentColor, setAccentColor] = useState('#3B82F6');
   const [fontSize, setFontSize] = useState('16px');
+  const [leadsViewMode, setLeadsViewMode] = useState('table');
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
@@ -424,20 +616,23 @@ function App() {
       <Routes>
         <Route path="/login" element={<LoginScreen />} />
         <Route path="/dashboard" element={<DashboardOverview />} />
+        <Route path="/leads" element={<LeadsScreen viewMode={leadsViewMode} />} />
         <Route path="/bottlenecks" element={<MainLayout><BottlenecksPage /></MainLayout>} />
         <Route path="/conversion-latency" element={<MainLayout><ConversionLatencyPage /></MainLayout>} />
-        <Route 
-          path="/settings" 
+        <Route
+          path="/settings"
           element={
-            <SettingsPlaceholder 
-              theme={theme} 
-              setTheme={setTheme} 
-              accentColor={accentColor} 
+            <SettingsPlaceholder
+              theme={theme}
+              setTheme={setTheme}
+              accentColor={accentColor}
               setAccentColor={setAccentColor}
               fontSize={fontSize}
               setFontSize={setFontSize}
+              leadsViewMode={leadsViewMode}
+              setLeadsViewMode={setLeadsViewMode}
             />
-          } 
+          }
         />
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
