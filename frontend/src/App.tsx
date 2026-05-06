@@ -3,6 +3,7 @@ import { Routes, Route, Navigate, Link, useLocation, useNavigate } from 'react-r
 import BottlenecksPage from './pages/BottlenecksPage';
 import ConversionLatencyPage from './pages/ConversionLatencyPage';
 import logo from './assets/logo.svg';
+import { MdBarChart, MdPeople, MdWarning, MdSchedule, MdSettings, MdExitToApp, MdTrackChanges, MdArrowForward, MdAttachMoney } from 'react-icons/md';
 
 /**
  * Credenciais de demonstração aceitas pelo sistema.
@@ -165,11 +166,11 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation();
 
   const navItems = [
-    { path: '/dashboard', label: 'Painel', icon: '📊' },
-    { path: '/leads', label: 'Leads', icon: '👥' },
-    { path: '/bottlenecks', label: 'Gargalos', icon: '🚨' },
-    { path: '/conversion-latency', label: 'Latência', icon: '⏱️' },
-    { path: '/settings', label: 'Configurações', icon: '⚙️' },
+    { path: '/dashboard', label: 'Painel', icon: <MdBarChart size={16} /> },
+    { path: '/leads', label: 'Leads', icon: <MdPeople size={16} /> },
+    { path: '/bottlenecks', label: 'Gargalos', icon: <MdWarning size={16} /> },
+    { path: '/conversion-latency', label: 'Latência', icon: <MdSchedule size={16} /> },
+    { path: '/settings', label: 'Configurações', icon: <MdSettings size={16} /> },
   ];
 
   return (
@@ -201,7 +202,7 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
         </nav>
         <div className="sidebar-footer">
           <Link to="/login" className="nav-link" style={{ color: 'var(--danger)' }}>
-            <span className="nav-icon">🚪</span>
+            <span className="nav-icon"><MdExitToApp size={16} /></span>
             Sair
           </Link>
         </div>
@@ -218,7 +219,7 @@ const DashboardOverview = () => (
     <header className="page-header">
       <div>
         <h2 className="page-title">
-          <span className="title-icon">📊</span>
+          <span className="title-icon"><MdBarChart size={20} /></span>
           Visão Geral
         </h2>
         <p className="page-subtitle">Dashboard do Diretor Comercial — Sprint 4: Motor de Gargalos</p>
@@ -231,7 +232,7 @@ const DashboardOverview = () => (
 
     <div className="kpi-grid">
       <div className="kpi-card kpi-info">
-        <div className="kpi-icon">🎯</div>
+        <div className="kpi-icon"><MdTrackChanges size={24} /></div>
         <div className="kpi-content">
           <span className="kpi-label">Leads Ativos</span>
           <span className="kpi-value">5</span>
@@ -239,7 +240,7 @@ const DashboardOverview = () => (
       </div>
 
       <div className="kpi-card kpi-danger">
-        <div className="kpi-icon">💰</div>
+        <div className="kpi-icon"><MdAttachMoney size={24} /></div>
         <div className="kpi-content">
           <span className="kpi-label">Valor em Risco</span>
           <span className="kpi-value">R$ 210.000</span>
@@ -248,7 +249,7 @@ const DashboardOverview = () => (
       </div>
 
       <div className="kpi-card kpi-warning">
-        <div className="kpi-icon">⚠️</div>
+        <div className="kpi-icon"><MdWarning size={24} /></div>
         <div className="kpi-content">
           <span className="kpi-label">Gargalos Ativos</span>
           <span className="kpi-value">4</span>
@@ -259,25 +260,25 @@ const DashboardOverview = () => (
     {/* Quick Links */}
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 'var(--spacing-lg)', marginTop: 'var(--spacing-xl)' }}>
       <Link to="/bottlenecks" className="quick-link-card glass-panel hover-lift">
-        <div className="quick-link-icon">🚨</div>
+        <div className="quick-link-icon"><MdWarning size={24} /></div>
         <div>
           <h4 style={{ color: 'var(--text-primary)', marginBottom: '0.25rem' }}>Gargalos Detectados</h4>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
             Veja leads parados além do SLA e o valor em risco de cada oportunidade estagnada.
           </p>
         </div>
-        <span className="quick-link-arrow">→</span>
+        <span className="quick-link-arrow"><MdArrowForward size={16} /></span>
       </Link>
 
       <Link to="/conversion-latency" className="quick-link-card glass-panel hover-lift">
-        <div className="quick-link-icon">⏱️</div>
+        <div className="quick-link-icon"><MdSchedule size={24} /></div>
         <div>
           <h4 style={{ color: 'var(--text-primary)', marginBottom: '0.25rem' }}>Latência de Conversão</h4>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
             Analise o tempo médio em cada etapa do funil e identifique onde sua equipe está perdendo dinheiro.
           </p>
         </div>
-        <span className="quick-link-arrow">→</span>
+        <span className="quick-link-arrow"><MdArrowForward size={16} /></span>
       </Link>
     </div>
   </MainLayout>

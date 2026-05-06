@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { auditApi, type BottleneckItem } from '../services/api';
+import { MdWarning, MdContentPaste, MdRefresh, MdAttachMoney, MdLens, MdClose } from 'react-icons/md';
 
 // Mock data for when the API is not available
 const MOCK_BOTTLENECKS: BottleneckItem[] = [
@@ -98,7 +99,7 @@ const BottlenecksPage: React.FC = () => {
       <header className="page-header">
         <div>
           <h2 className="page-title">
-            <span className="title-icon">🚨</span>
+            <span className="title-icon"><MdWarning size={20} /></span>
             Gargalos Detectados
           </h2>
           <p className="page-subtitle">
@@ -108,11 +109,11 @@ const BottlenecksPage: React.FC = () => {
         <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
           {useMock && (
             <span className="mock-badge">
-              📋 Dados de demonstração
+              <MdContentPaste size={16} /> Dados de demonstração
             </span>
           )}
           <button className="btn btn-secondary hover-lift" onClick={loadBottlenecks}>
-            ↻ Atualizar
+            <MdRefresh size={16} /> Atualizar
           </button>
         </div>
       </header>
@@ -120,7 +121,7 @@ const BottlenecksPage: React.FC = () => {
       {/* KPI Summary Cards */}
       <div className="kpi-grid">
         <div className="kpi-card kpi-danger">
-          <div className="kpi-icon">💰</div>
+          <div className="kpi-icon"><MdAttachMoney size={24} /></div>
           <div className="kpi-content">
             <span className="kpi-label">Valor em Risco Total</span>
             <span className="kpi-value">{formatCurrency(totalValueAtRisk)}</span>
@@ -129,7 +130,7 @@ const BottlenecksPage: React.FC = () => {
         </div>
 
         <div className="kpi-card kpi-warning">
-          <div className="kpi-icon">⚠️</div>
+          <div className="kpi-icon"><MdWarning size={24} /></div>
           <div className="kpi-content">
             <span className="kpi-label">Gargalos Ativos</span>
             <span className="kpi-value">{bottlenecks.length}</span>
@@ -137,7 +138,7 @@ const BottlenecksPage: React.FC = () => {
         </div>
 
         <div className="kpi-card kpi-critical">
-          <div className="kpi-icon">🔴</div>
+          <div className="kpi-icon"><MdLens color="var(--danger)" size={24} /></div>
           <div className="kpi-content">
             <span className="kpi-label">Críticos (2x SLA)</span>
             <span className="kpi-value">{criticalCount}</span>
@@ -153,7 +154,7 @@ const BottlenecksPage: React.FC = () => {
         </div>
       ) : error ? (
         <div className="error-container glass-panel">
-          <p>❌ {error}</p>
+          <p><MdClose size={16} /> {error}</p>
           <button className="btn btn-primary" onClick={loadBottlenecks}>Tentar novamente</button>
         </div>
       ) : (
@@ -176,8 +177,8 @@ const BottlenecksPage: React.FC = () => {
                   <tr key={item.id ?? idx} className={`urgency-${urgency}`}>
                     <td>
                       <span className={`status-badge status-${urgency}`}>
-                        {urgency === 'critical' ? '🔴 CRÍTICO' :
-                         urgency === 'warning' ? '🟡 ALERTA' : '🟠 MODERADO'}
+                        {urgency === 'critical' ? <><MdLens color="var(--danger)" size={12} /> CRÍTICO</> :
+                         urgency === 'warning' ? <><MdLens color="var(--warning)" size={12} /> ALERTA</> : <><MdLens color="orange" size={12} /> MODERADO</>}
                       </span>
                     </td>
                     <td>

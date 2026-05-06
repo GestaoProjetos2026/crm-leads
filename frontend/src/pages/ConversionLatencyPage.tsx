@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { auditApi, type ConversionLatencyItem } from '../services/api';
+import { MdBarChart, MdContentPaste, MdRefresh, MdAttachMoney, MdSchedule, MdTrendingUp, MdLens } from 'react-icons/md';
 
 // Mock data for when the API is not available
 const MOCK_LATENCY: ConversionLatencyItem[] = [
@@ -70,7 +71,7 @@ const ConversionLatencyPage: React.FC = () => {
       <header className="page-header">
         <div>
           <h2 className="page-title">
-            <span className="title-icon">📊</span>
+            <span className="title-icon"><MdBarChart size={20} /></span>
             Latência de Conversão por Etapa
           </h2>
           <p className="page-subtitle">
@@ -78,15 +79,15 @@ const ConversionLatencyPage: React.FC = () => {
           </p>
         </div>
         <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
-          {useMock && <span className="mock-badge">📋 Dados de demonstração</span>}
-          <button className="btn btn-secondary hover-lift" onClick={loadLatency}>↻ Atualizar</button>
+          {useMock && <span className="mock-badge"><MdContentPaste size={16} /> Dados de demonstração</span>}
+          <button className="btn btn-secondary hover-lift" onClick={loadLatency}><MdRefresh size={16} /> Atualizar</button>
         </div>
       </header>
 
       {/* Executive KPI Cards */}
       <div className="kpi-grid">
         <div className="kpi-card kpi-danger">
-          <div className="kpi-icon">💸</div>
+          <div className="kpi-icon"><MdAttachMoney size={24} /></div>
           <div className="kpi-content">
             <span className="kpi-label">Custo da Ineficiência</span>
             <span className="kpi-value">{formatCurrency(totalValueAtRisk)}</span>
@@ -95,7 +96,7 @@ const ConversionLatencyPage: React.FC = () => {
         </div>
 
         <div className="kpi-card kpi-warning">
-          <div className="kpi-icon">⏱️</div>
+          <div className="kpi-icon"><MdSchedule size={24} /></div>
           <div className="kpi-content">
             <span className="kpi-label">Leads Estagnados</span>
             <span className="kpi-value">{totalStagnant} <span className="kpi-small">/ {totalOpportunities}</span></span>
@@ -103,7 +104,7 @@ const ConversionLatencyPage: React.FC = () => {
         </div>
 
         <div className="kpi-card kpi-info">
-          <div className="kpi-icon">📈</div>
+          <div className="kpi-icon"><MdTrendingUp size={24} /></div>
           <div className="kpi-content">
             <span className="kpi-label">Oportunidades Ativas</span>
             <span className="kpi-value">{totalOpportunities}</span>
@@ -138,7 +139,7 @@ const ConversionLatencyPage: React.FC = () => {
                       </div>
                       <div className="stage-metrics">
                         <span className="avg-time" style={{ color: healthColor }}>
-                          ⌀ {formatHours(Number(stage.avgHours))}
+                          Ø {formatHours(Number(stage.avgHours))}
                         </span>
                         <span className="sla-label">SLA: {sla}h</span>
                       </div>
@@ -168,7 +169,7 @@ const ConversionLatencyPage: React.FC = () => {
                       </span>
                       {Number(stage.totalStagnant) > 0 && (
                         <span className="footer-stat footer-stagnant">
-                          🔴 {stage.totalStagnant} estagnadas ({formatCurrency(Number(stage.totalValueAtRisk))})
+                          <MdLens color="var(--danger)" size={12} /> {stage.totalStagnant} estagnadas ({formatCurrency(Number(stage.totalValueAtRisk))})
                         </span>
                       )}
                       <span className="footer-stat">
