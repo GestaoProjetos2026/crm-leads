@@ -1,0 +1,164 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches:
+      - Feature
+    paths:
+      - 'backend/**'
+      - 'docker-compose.yml'
+      - '.github/workflows/deploy.yml'
+
+env:
+  REGISTRY: docker.io
+  IMAGE_NAME: gitact/salesweakness-api
+  CONTAINER_NAME: salesweakness-api
+  CONTAINER_PORT: 3000
+  DEPLOY_HOST: 20.39.132.34
+  DEPLOY_USER: gp2026
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=sha,prefix={{branch}}-
+            type=raw,value=latest
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          target: production
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    if: success()
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H ${{ env.DEPLOY_HOST }} >> ~/.ssh/known_hosts 2>/dev/null || true
+
+      - name: Push .env to production
+        run: |
+          scp -i ~/.ssh/deploy_key \
+            -P 22 \
+            backend/.env \
+            ${{ env.DEPLOY_USER }}@${{ env.DEPLOY_HOST }}:~/salesweakness/backend/.env
+
+      - name: Deploy container
+        run: |
+          ssh -i ~/.ssh/deploy_key \
+            -o StrictHostKeyChecking=no \
+            ${{ env.DEPLOY_USER }}@${{ env.DEPLOY_HOST }} << 'EOF'
+          set -e
+
+          REGISTRY="${{ env.REGISTRY }}"
+          IMAGE_NAME="${{ env.IMAGE_NAME }}"
+          CONTAINER_NAME="${{ env.CONTAINER_NAME }}"
+          CONTAINER_PORT="${{ env.CONTAINER_PORT }}"
+
+          # Variables
+          IMAGE="${REGISTRY}/${IMAGE_NAME}:latest"
+          ENV_FILE="$HOME/salesweakness/backend/.env"
+
+          echo "Starting deployment..."
+          echo "Pulling latest image: $IMAGE"
+
+          # Login to Docker Hub if credentials provided
+          if [ -n "${{ secrets.DOCKER_USERNAME }}" ] && [ -n "${{ secrets.DOCKER_PASSWORD }}" ]; then
+            echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+          fi
+
+          # Pull latest image
+          docker pull "$IMAGE"
+
+          # Stop existing container
+          if docker ps -a --format '{{.Names}}' | grep -q "^${CONTAINER_NAME}$"; then
+            echo "Stopping existing container: $CONTAINER_NAME"
+            docker stop "$CONTAINER_NAME" || true
+            docker rm "$CONTAINER_NAME" || true
+            sleep 2
+          fi
+
+          # Start new container
+          echo "Starting new container..."
+          docker run -d \
+            --name "$CONTAINER_NAME" \
+            --restart unless-stopped \
+            -p "${CONTAINER_PORT}:3000" \
+            --env-file "$ENV_FILE" \
+            --network salesweakness \
+            -e DB_HOST=salesweakness-db \
+            -e REDIS_HOST=salesweakness-redis \
+            "$IMAGE"
+
+          # Verify container is running
+          sleep 3
+          if docker ps --format '{{.Names}}' | grep -q "^${CONTAINER_NAME}$"; then
+            echo "✓ Container deployed successfully!"
+            docker ps -a --filter "name=${CONTAINER_NAME}"
+          else
+            echo "✗ Container failed to start"
+            docker logs "$CONTAINER_NAME" || true
+            exit 1
+          fi
+
+          # Cleanup
+          docker logout || true
+          echo "Deployment completed!"
+        EOF
+
+      - name: Cleanup SSH key
+        if: always()
+        run: |
+          rm -f ~/.ssh/deploy_key ~/.ssh/known_hosts
+
+      - name: Deployment Status
+        if: success()
+        run: |
+          echo "✓ Deployment to ${{ env.DEPLOY_HOST }} completed successfully!"
+          echo "Container: ${{ env.CONTAINER_NAME }}"
+          echo "Image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest"
+
+      - name: Deployment Failed
+        if: failure()
+        run: |
+          echo "✗ Deployment failed. Please check the logs above."
+          exit 1

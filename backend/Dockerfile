@@ -4,7 +4,7 @@ FROM node:24-alpine AS builder
 WORKDIR /usr/src/app
 
 COPY package*.json ./
-RUN npm ci
+RUN npm ci --legacy-peer-deps
 
 COPY . .
 RUN npm run build
@@ -18,7 +18,7 @@ ENV NODE_ENV=${NODE_ENV}
 WORKDIR /usr/src/app
 
 COPY package*.json ./
-RUN npm ci --only=production && npm cache clean --force
+RUN npm ci --omit=dev --legacy-peer-deps && npm cache clean --force
 
 COPY --from=builder /usr/src/app/dist ./dist
 
