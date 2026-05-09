@@ -1,0 +1,30 @@
+# ─── Application ───────────────────────────────────────────────────────────────
+NODE_ENV=development
+PORT=3000
+APP_NAME=SalesWeakness
+
+# ─── Database (PostgreSQL) ──────────────────────────────────────────────────────
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=sales_weakness
+DB_USER=sales_weakness
+DB_PASSWORD=a45d18e435e8426d6bcd9c1d264bbf2d0019955683713044ab7659db6ca74ad7
+# For TypeORM synchronize — NEVER use true in production
+DB_SYNCHRONIZE=false
+
+# ─── Redis ─────────────────────────────────────────────────────────────────────
+REDIS_HOST=localhost
+REDIS_PORT=6379
+REDIS_USER=redis_sales_weakness
+REDIS_PASSWORD=9dae3874790746cc3306920234d88ede517cdef6c5376fc50bbbfe86bee9a0a7
+
+# Analytics cache TTL in seconds (default: 300 = 5 minutes)
+CACHE_TTL_SECONDS=300
+
+# ─── Auth (JWT) ─────────────────────────────────────────────────────────────────
+JWT_SECRET=28e43872e0ad1a8e385b183897e2168e83234e8150b34b6c336ac1f31db64529
+JWT_EXPIRES_IN=1h
+
+# ─── Rate Limiting ──────────────────────────────────────────────────────────────
+THROTTLE_TTL_SECONDS=60
+THROTTLE_LIMIT=100
