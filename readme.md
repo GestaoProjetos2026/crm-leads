@@ -133,9 +133,9 @@ Camada de apresentação 100% web, sem aplicativo mobile no MVP. Responsável po
 
 **Requisito técnico crítico:** O dashboard do SDR deve atualizar o Kanban em **tempo real** via WebSocket ou polling curto (< 5s), refletindo leads recém-estagnados sem recarregamento de página. Isso é viabilizado pela conexão direta ao API Gateway via WebSocket, com eventos emitidos pelo Serviço de CRM ao detectar mudanças de estado.
 
-![Alt text](docs\imgs\home.png "home")
-![Alt text](docs\imgs\Gargalos.png "Gargalos")
-![Alt text](docs\imgs\Latencia.png "Latencia")
+![Alt text](docs/imgs/home.png "home")
+![Alt text](docs/imgs/Gargalos.png "Gargalos")
+![Alt text](docs/imgs/Latencia.png "Latencia")
 
 ### 4.2 API Gateway
 

@@ -1,4 +1,5 @@
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
+import { mockLeadsData, mockOpportunitiesData } from './mocks/mockData';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/v1';
 
@@ -10,12 +11,46 @@ const api = axios.create({
   },
 });
 
-// Request interceptor: attach JWT if available
+// Request interceptor: attach JWT if available and apply mocks
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('sw_token');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+
+  // --- Mock Interceptors ---
+  if (config.url?.startsWith('/leads')) {
+    config.adapter = async () => {
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          resolve({
+            data: mockLeadsData,
+            status: 200,
+            statusText: 'OK',
+            headers: {},
+            config,
+          } as AxiosResponse);
+        }, 600); // simulate network latency
+      });
+    };
+  }
+
+  if (config.url?.startsWith('/opportunities')) {
+    config.adapter = async () => {
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          resolve({
+            data: mockOpportunitiesData,
+            status: 200,
+            statusText: 'OK',
+            headers: {},
+            config,
+          } as AxiosResponse);
+        }, 600); // simulate network latency
+      });
+    };
+  }
+
   return config;
 });
 
