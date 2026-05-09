@@ -75,6 +75,13 @@ jobs:
           chmod 600 ~/.ssh/deploy_key
           ssh-keyscan -H ${{ env.DEPLOY_HOST }} >> ~/.ssh/known_hosts 2>/dev/null || true
 
+      - name: Push .env to production
+        run: |
+          scp -i ~/.ssh/deploy_key \
+            -P 22 \
+            backend/.env \
+            ${{ env.DEPLOY_USER }}@${{ env.DEPLOY_HOST }}:~/salesweakness/backend/.env
+
       - name: Deploy container
         run: |
           ssh -i ~/.ssh/deploy_key \
