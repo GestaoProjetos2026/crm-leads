@@ -1,6 +1,6 @@
 import { createServer } from 'http';
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3031;
 
 const server = createServer((req, res) => {
   res.statusCode = 200;

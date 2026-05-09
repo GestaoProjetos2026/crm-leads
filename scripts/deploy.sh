@@ -106,7 +106,7 @@ restart() {
     docker run -d \
         --name "$CONTAINER_NAME" \
         --restart unless-stopped \
-        -p 3000:3000 \
+        -p 3031:3031 \
         --env-file "$ENV_FILE" \
         --network "$NETWORK" \
         -e DB_HOST=salesweakness-db \
@@ -186,7 +186,7 @@ health() {
         echo "Status: $HEALTH"
 
         # Tentar conectar
-        if curl -s http://localhost:3000/health &> /dev/null; then
+        if curl -s http://localhost:3031/health &> /dev/null; then
             log_success "Aplicação respondendo normalmente"
         else
             log_warning "Endpoint /health não respondeu"

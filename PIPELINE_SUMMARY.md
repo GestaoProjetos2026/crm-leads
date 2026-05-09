@@ -40,7 +40,7 @@ VM_SETUP.md                     # Guia de setup da VM
 │     ├─ Remover container antigo                             │
 │     └─ Iniciar novo container                               │
 │        ├─ Rede: salesweakness                               │
-│        ├─ Porta: 3000:3000                                  │
+│        ├─ Porta: 3031:3031                                  │
 │        └─ Variáveis de ambiente do .env                    │
 │     ↓                                                        │
 │  6. Verificação de saúde                                    │
@@ -155,7 +155,7 @@ docker logs -f salesweakness-api
 
 # ✅ Na VM
 [ ] Container salesweakness-api rodando
-[ ] Porta 3000 respondendo
+[ ] Porta 3031 respondendo
 [ ] Conectado à rede salesweakness
 [ ] Conectado ao database
 [ ] Conectado ao redis
@@ -214,7 +214,7 @@ docker inspect salesweakness-api  # Detalhes completos
 | **"Unable to find image"** | Credenciais Docker Hub incorretas no Secrets |
 | **"Container fails to start"** | .env não foi copiado corretamente ou variáveis incorretas |
 | **"Network not found"** | Executar: `docker network create salesweakness` |
-| **"Port 3000 already in use"** | Container antigo ainda rodando ou outra aplicação na porta |
+| **"Port 3031 already in use"** | Container antigo ainda rodando ou outra aplicação na porta |
 
 ## 📚 Documentação Adicional
 

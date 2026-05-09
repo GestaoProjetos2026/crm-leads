@@ -123,7 +123,7 @@ docker run -d --name salesweakness-redis --network salesweakness redis:7-alpine
    - Inicia novo container com:
      - Variáveis de ambiente do .env
      - Rede Docker: `salesweakness`
-     - Porta: 3000
+     - Porta: 3031
      - Restart: unless-stopped
 
 ---

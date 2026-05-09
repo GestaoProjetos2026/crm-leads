@@ -25,7 +25,7 @@ COPY --from=builder /usr/src/app/dist ./dist
 # Use non-root user
 USER node
 
-EXPOSE 3000
+EXPOSE 3031
 
 CMD ["node", "dist/main"]
 

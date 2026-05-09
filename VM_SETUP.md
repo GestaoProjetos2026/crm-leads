@@ -67,7 +67,7 @@ DB_PASSWORD=sua_senha_forte_aqui
 DB_NAME=salesweakness
 REDIS_HOST=salesweakness-redis
 REDIS_PORT=6379
-PORT=3000
+PORT=3031
 EOF
 
 chmod 600 ~/salesweakness/backend/.env
@@ -126,7 +126,7 @@ docker pull docker.io/gitact/salesweakness-api:latest
 - [ ] Permissões corretas: `chmod 600 .env`
 - [ ] Docker rodando sem sudo para o usuário
 - [ ] Rede Docker `salesweakness` criada
-- [ ] Firewall configurado (porta 3000 acessível conforme necessário)
+- [ ] Firewall configurado (porta 3031 acessível conforme necessário)
 - [ ] Backup de dados Postgres configurado
 - [ ] Logs de container monitorados
 

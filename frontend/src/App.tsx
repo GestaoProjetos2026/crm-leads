@@ -31,7 +31,7 @@ const LoginScreen = () => {
 
     try {
       // 1. Tenta autenticar no backend real (NestJS)
-      const response = await fetch('http://localhost:3000/v1/auth/login', {
+      const response = await fetch('http://localhost:3031/v1/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
