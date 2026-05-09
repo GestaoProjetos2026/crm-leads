@@ -11,7 +11,7 @@ on:
 
 env:
   REGISTRY: docker.io
-  IMAGE_NAME: gitact/salesweakness-api
+  IMAGE_NAME: and5reas/salesweakness-api
   CONTAINER_NAME: salesweakness-api
   CONTAINER_PORT: 3000
   DEPLOY_HOST: 20.39.132.34
