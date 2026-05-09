@@ -174,7 +174,7 @@ jobs:
           docker run -d \
             --name "$BACKEND_CONTAINER" \
             --restart unless-stopped \
-            -p "${BACKEND_PORT}:3000" \
+            -p "${BACKEND_PORT}:3031" \
             --env-file "$ENV_FILE" \
             --network salesweakness \
             -e DB_HOST=salesweakness-db \
@@ -204,7 +204,7 @@ jobs:
           docker run -d \
             --name "$FRONTEND_CONTAINER" \
             --restart unless-stopped \
-            -p "${FRONTEND_PORT}:80" \
+            -p "${FRONTEND_PORT}:3032" \
             --network salesweakness \
             "$FRONTEND_IMG"
 
