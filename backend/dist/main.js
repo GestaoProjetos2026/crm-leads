@@ -25,7 +25,7 @@ async function bootstrap() {
     app.useGlobalFilters(new http_exception_filter_1.HttpExceptionFilter());
     app.useGlobalInterceptors(new tenant_context_interceptor_1.TenantContextInterceptor());
     (0, swagger_config_js_1.setupSwagger)(app);
-    const port = configService.get('app.port') ?? 3000;
+    const port = configService.get('app.port') ?? 3031;
     await app.listen(port, '0.0.0.0');
     console.log(`Application is running on: http://localhost:${port}/v1`);
     console.log(`Swagger docs at: http://localhost:${port}/api/docs`);

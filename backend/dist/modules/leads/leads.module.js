@@ -12,6 +12,7 @@ const typeorm_1 = require("@nestjs/typeorm");
 const lead_entity_1 = require("./entities/lead.entity");
 const opportunity_entity_1 = require("../opportunities/entities/opportunity.entity");
 const stage_entity_1 = require("../stages/entities/stage.entity");
+const stage_transition_log_entity_1 = require("../opportunities/entities/stage-transition-log.entity");
 const leads_service_1 = require("./leads.service");
 const leads_controller_1 = require("./leads.controller");
 let LeadsModule = class LeadsModule {
@@ -19,7 +20,9 @@ let LeadsModule = class LeadsModule {
 exports.LeadsModule = LeadsModule;
 exports.LeadsModule = LeadsModule = __decorate([
     (0, common_1.Module)({
-        imports: [typeorm_1.TypeOrmModule.forFeature([lead_entity_1.Lead, opportunity_entity_1.Opportunity, stage_entity_1.Stage])],
+        imports: [
+            typeorm_1.TypeOrmModule.forFeature([lead_entity_1.Lead, opportunity_entity_1.Opportunity, stage_entity_1.Stage, stage_transition_log_entity_1.StageTransitionLog]),
+        ],
         controllers: [leads_controller_1.LeadsController],
         providers: [leads_service_1.LeadsService],
         exports: [leads_service_1.LeadsService],

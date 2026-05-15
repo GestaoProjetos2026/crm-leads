@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 import { APP_GUARD } from '@nestjs/core';
 import { Reflector } from '@nestjs/core';
 import { AppController } from './app.controller';
@@ -26,6 +27,9 @@ import type { TypeOrmModuleOptions } from '@nestjs/typeorm';
       isGlobal: true,
       load: [appConfig, databaseConfig, redisConfig],
     }),
+
+    // Event system for lead.stagnated and future domain events
+    EventEmitterModule.forRoot(),
 
     // TypeORM connected via ConfigService so credentials come from .env
     TypeOrmModule.forRootAsync({

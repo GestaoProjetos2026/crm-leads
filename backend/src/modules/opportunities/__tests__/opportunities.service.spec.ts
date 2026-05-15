@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { OpportunitiesService } from '../opportunities.service';
 import { Opportunity } from '../entities/opportunity.entity';
+import { StageTransitionLog } from '../entities/stage-transition-log.entity';
 
 describe('OpportunitiesService', () => {
   let service: OpportunitiesService;
@@ -12,6 +13,10 @@ describe('OpportunitiesService', () => {
         OpportunitiesService,
         {
           provide: getRepositoryToken(Opportunity),
+          useValue: {}, // mock repository
+        },
+        {
+          provide: getRepositoryToken(StageTransitionLog),
           useValue: {}, // mock repository
         },
       ],

@@ -50,58 +50,48 @@ let AuditService = class AuditService {
     }
     async getConversionLatency(tenantId) {
         const results = await this.auditLogRepository.query(`
-      WITH stage_metrics AS (
+      WITH stage_durations AS (
         SELECT
-          s.id AS stage_id,
+          stl.tenant_id,
+          stl.to_stage_id AS stage_id,
           s.name AS stage_name,
           s.order_position,
           s.sla_max_hours,
-          COUNT(o.id) AS total_opportunities,
-          ROUND(AVG(EXTRACT(EPOCH FROM (
-            CASE
-              WHEN o.status = 'Open' THEN NOW()
-              ELSE o.updated_at
-            END - o.created_at
-          )) / 3600), 1) AS avg_hours,
-          ROUND(MAX(EXTRACT(EPOCH FROM (
-            CASE
-              WHEN o.status = 'Open' THEN NOW()
-              ELSE o.updated_at
-            END - o.created_at
-          )) / 3600), 1) AS max_hours,
-          ROUND(MIN(EXTRACT(EPOCH FROM (
-            CASE
-              WHEN o.status = 'Open' THEN NOW()
-              ELSE o.updated_at
-            END - o.created_at
-          )) / 3600), 1) AS min_hours,
-          COUNT(CASE
-            WHEN o.status = 'Open'
-              AND EXTRACT(EPOCH FROM (NOW() - o.updated_at)) / 3600 > s.sla_max_hours
-            THEN 1
-          END) AS total_stagnant,
-          COALESCE(SUM(CASE
-            WHEN o.status = 'Open'
-              AND EXTRACT(EPOCH FROM (NOW() - o.updated_at)) / 3600 > s.sla_max_hours
-            THEN o.value
-            ELSE 0
-          END), 0) AS total_value_at_risk
-        FROM stages s
-        LEFT JOIN opportunities o ON o.stage_id = s.id AND o.tenant_id = s.tenant_id
-        WHERE s.tenant_id = $1
-        GROUP BY s.id, s.name, s.order_position, s.sla_max_hours
+          stl.opportunity_id,
+          o.value,
+          o.status,
+          EXTRACT(EPOCH FROM (
+            COALESCE(
+              LEAD(stl.transitioned_at) OVER (
+                PARTITION BY stl.opportunity_id ORDER BY stl.transitioned_at ASC
+              ),
+              CASE WHEN o.status = 'Open' THEN NOW() ELSE o.updated_at END
+            ) - stl.transitioned_at
+          )) / 3600 AS hours_in_stage
+        FROM stage_transition_logs stl
+        JOIN stages s ON stl.to_stage_id = s.id
+        JOIN opportunities o ON stl.opportunity_id = o.id
+        WHERE stl.tenant_id = $1
       )
       SELECT
         stage_id AS "stageId",
         stage_name AS "stageName",
         order_position AS "orderPosition",
-        COALESCE(avg_hours, 0) AS "avgHours",
-        COALESCE(max_hours, 0) AS "maxHours",
-        COALESCE(min_hours, 0) AS "minHours",
-        total_opportunities AS "totalOpportunities",
-        total_stagnant AS "totalStagnant",
-        total_value_at_risk AS "totalValueAtRisk"
-      FROM stage_metrics
+        ROUND(COALESCE(AVG(hours_in_stage), 0)::numeric, 1) AS "avgHours",
+        ROUND(COALESCE(MAX(hours_in_stage), 0)::numeric, 1) AS "maxHours",
+        ROUND(COALESCE(MIN(hours_in_stage), 0)::numeric, 1) AS "minHours",
+        COUNT(DISTINCT opportunity_id)::int AS "totalOpportunities",
+        COUNT(CASE
+          WHEN status = 'Open' AND hours_in_stage > sla_max_hours
+          THEN 1
+        END)::int AS "totalStagnant",
+        COALESCE(SUM(CASE
+          WHEN status = 'Open' AND hours_in_stage > sla_max_hours
+          THEN value
+          ELSE 0
+        END), 0) AS "totalValueAtRisk"
+      FROM stage_durations
+      GROUP BY stage_id, stage_name, order_position, sla_max_hours
       ORDER BY order_position ASC
       `, [tenantId]);
         return results;

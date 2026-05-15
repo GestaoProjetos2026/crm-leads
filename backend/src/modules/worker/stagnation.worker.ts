@@ -2,16 +2,21 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Opportunity } from '../opportunities/entities/opportunity.entity';
 import { AuditLog } from '../audit/entities/audit-log.entity';
 import { Stage } from '../stages/entities/stage.entity';
+import { LeadStagnatedEvent } from './events/lead-stagnated.event';
 
 /**
- * StagnationWorker — runs every 15 minutes to detect leads stuck in a pipeline stage
+ * StagnationWorker — runs every 10 minutes to detect leads stuck in a pipeline stage
  * beyond the configured SLA threshold (default: 48h).
  *
  * Implements idempotency: will NOT create duplicate audit_log entries for the same
  * opportunity + stage + weakness_type combination.
+ *
+ * Emits a `lead.stagnated` event for each new stagnation alert, enabling
+ * downstream automations (notifications, webhooks, reassignment, etc.).
  */
 @Injectable()
 export class StagnationWorker {
@@ -26,10 +31,12 @@ export class StagnationWorker {
 
     @InjectRepository(Stage)
     private readonly stageRepo: Repository<Stage>,
+
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   /**
-   * Scan for stagnant leads every 15 minutes.
+   * Scan for stagnant leads every 10 minutes.
    * Query: Find all OPEN opportunities where (NOW() - updated_at) exceeds the
    * stage's sla_max_hours threshold.
    */
@@ -103,6 +110,27 @@ export class StagnationWorker {
 
         await this.auditLogRepo.save(auditLog);
         newAlerts++;
+
+        // Emit event for downstream automations
+        const detectedAt = new Date();
+        this.eventEmitter.emit(
+          LeadStagnatedEvent.EVENT_NAME,
+          new LeadStagnatedEvent(
+            opp.tenant_id,
+            opp.opportunity_id,
+            opp.lead_id,
+            opp.stage_id,
+            opp.stage_name,
+            hoursStagnant,
+            opp.sla_max_hours,
+            opp.value,
+            detectedAt,
+          ),
+        );
+
+        this.logger.debug(
+          `Emitted ${LeadStagnatedEvent.EVENT_NAME} for Opportunity #${opp.opportunity_id}`,
+        );
       }
 
       this.logger.log(

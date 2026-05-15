@@ -20,15 +20,18 @@ const typeorm_2 = require("typeorm");
 const lead_entity_1 = require("./entities/lead.entity");
 const opportunity_entity_1 = require("../opportunities/entities/opportunity.entity");
 const stage_entity_1 = require("../stages/entities/stage.entity");
+const stage_transition_log_entity_1 = require("../opportunities/entities/stage-transition-log.entity");
 let LeadsService = LeadsService_1 = class LeadsService {
     leadsRepository;
     opportunityRepository;
     stageRepository;
+    transitionLogRepository;
     logger = new common_1.Logger(LeadsService_1.name);
-    constructor(leadsRepository, opportunityRepository, stageRepository) {
+    constructor(leadsRepository, opportunityRepository, stageRepository, transitionLogRepository) {
         this.leadsRepository = leadsRepository;
         this.opportunityRepository = opportunityRepository;
         this.stageRepository = stageRepository;
+        this.transitionLogRepository = transitionLogRepository;
     }
     async ingestLead(tenantId, dto) {
         const existingLead = await this.leadsRepository.findOne({
@@ -51,14 +54,23 @@ let LeadsService = LeadsService_1 = class LeadsService {
             where: { tenantId },
             order: { orderPosition: 'ASC' },
         });
+        const firstStageId = firstStage?.id ?? 1;
         const opportunity = this.opportunityRepository.create({
             tenantId,
             leadId: savedLead.id,
-            stageId: firstStage?.id ?? 1,
+            stageId: firstStageId,
             status: 'Open',
         });
         const savedOpportunity = await this.opportunityRepository.save(opportunity);
         this.logger.log(`Opportunity created: id=${savedOpportunity.id} stage=${firstStage?.name ?? 'default'}`);
+        const transitionLog = this.transitionLogRepository.create({
+            tenantId,
+            opportunityId: savedOpportunity.id,
+            fromStageId: null,
+            toStageId: firstStageId,
+        });
+        await this.transitionLogRepository.save(transitionLog);
+        this.logger.log(`Transition log created: opportunity=${savedOpportunity.id} → stage=${firstStage?.name ?? 'default'}`);
         return { lead: savedLead, opportunity: savedOpportunity };
     }
     async findByTenant(tenantId) {
@@ -74,7 +86,9 @@ exports.LeadsService = LeadsService = LeadsService_1 = __decorate([
     __param(0, (0, typeorm_1.InjectRepository)(lead_entity_1.Lead)),
     __param(1, (0, typeorm_1.InjectRepository)(opportunity_entity_1.Opportunity)),
     __param(2, (0, typeorm_1.InjectRepository)(stage_entity_1.Stage)),
+    __param(3, (0, typeorm_1.InjectRepository)(stage_transition_log_entity_1.StageTransitionLog)),
     __metadata("design:paramtypes", [typeorm_2.Repository,
+        typeorm_2.Repository,
         typeorm_2.Repository,
         typeorm_2.Repository])
 ], LeadsService);
