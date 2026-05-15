@@ -20,19 +20,19 @@ VM_SETUP.md                     # Guia de setup da VM
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │  1. Push para branch "Feature"                              │
-│     ↓                                                        │
+│     ↓                                                       │
 │  2. GitHub Actions dispara                                  │
-│     ↓                                                        │
-│  3. Build Docker image (target: production)                │
+│     ↓                                                       │
+│  3. Build Docker image (target: production)                 │
 │     ├─ Node 24 Alpine                                       │
 │     ├─ Multi-stage: builder + production                    │
-│     └─ Otimizado para tamanho e segurança                  │
-│     ↓                                                        │
-│  4. Push para Docker Hub (gitact/salesweakness-api)        │
+│     └─ Otimizado para tamanho e segurança                   │
+│     ↓                                                       │
+│  4. Push para Docker Hub (gitact/salesweakness-api)         │
 │     ├─ Tag: Feature-{SHA}                                   │
 │     ├─ Tag: Feature (branch)                                │
 │     └─ Tag: latest                                          │
-│     ↓                                                        │
+│     ↓                                                       │
 │  5. SSH na VM (gp2026@20.39.132.34)                         │
 │     ├─ Enviar .env via SCP                                  │
 │     ├─ Pull da imagem latest                                │
@@ -41,10 +41,10 @@ VM_SETUP.md                     # Guia de setup da VM
 │     └─ Iniciar novo container                               │
 │        ├─ Rede: salesweakness                               │
 │        ├─ Porta: 3031:3031                                  │
-│        └─ Variáveis de ambiente do .env                    │
-│     ↓                                                        │
+│        └─ Variáveis de ambiente do .env                     │
+│     ↓                                                       │
 │  6. Verificação de saúde                                    │
-│     └─ Container rodando? ✓                                 │
+│     └─ Container rodando? Check                             │
 └─────────────────────────────────────────────────────────────┘
 ```
 
