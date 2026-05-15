@@ -94,27 +94,27 @@ Todos os disparos externos (WhatsApp, e-mail, webhooks) são enfileirados em uma
 │ POST ingest │  │ Cache Redis (P95<300ms)│  │ Disparo WhatsApp/Mail│
 │ Kanban API  │  │ CTEs + Agregados       │  │ Retry Logic          │
 └──────┬──────┘  └───────────┬────────────┘  └──────────┬───────────┘
-       │                     │                           │
-       └─────────────────────┼───────────────────────────┘
+       │                     │                          │
+       └─────────────────────┼──────────────────────────┘
                              │
        ┌─────────────────────▼───────────────────────────┐
-       │                 CAMADA DE DADOS                  │
-       │                                                  │
+       │                 CAMADA DE DADOS                 │
+       │                                                 │
        │  PostgreSQL (RLS ativo) │ Redis (Cache/Filas)   │
-       │  Isolamento por tenant  │ TTL configurável       │
+       │  Isolamento por tenant  │ TTL configurável      │
        └────────────────────────┬────────────────────────┘
                                 │
        ┌────────────────────────▼────────────────────────┐
-       │          PROCESSAMENTO EM BACKGROUND             │
-       │                                                  │
+       │          PROCESSAMENTO EM BACKGROUND            │
+       │                                                 │
        │  Worker: Detecção de Estagnação 48h (Cron)      │
        │  Worker: Marcação de Inatividade 180d (Cron)    │
        │  Worker: Consumidor de Fila (Webhooks/Automação)│
        └────────────────────────┬────────────────────────┘
                                 │
        ┌────────────────────────▼────────────────────────┐
-       │           MESSAGE QUEUE (RabbitMQ / SQS)         │
-       │                                                  │
+       │           MESSAGE QUEUE (RabbitMQ / SQS)        │
+       │                                                 │
        │  Fila: lead.stagnated                           │
        │  Fila: lead.inactive                            │
        │  Fila: campaign.low_conversion                  │
