@@ -1,0 +1,77 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: salesweakness-db
+    restart: unless-stopped
+    networks:
+      - app-network
+    environment:
+      POSTGRES_USER: ${DB_USER:-salesweakness}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-salesweakness}
+      POSTGRES_DB: ${DB_NAME:-salesweakness}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docs/Database/init.sql:/docker-entrypoint-initdb.d/01-init.sql
+    ports:
+      - "5432:5432"
+    command: >
+      postgres
+      -c shared_buffers=256MB
+      -c effective_cache_size=768MB
+      -c work_mem=4MB
+      -c maintenance_work_mem=128MB
+      -c random_page_cost=1.8
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${DB_USER:-salesweakness}']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: salesweakness-redis
+    restart: unless-stopped
+    networks:
+      - app-network
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      target: development
+    container_name: salesweakness-api
+    restart: unless-stopped
+    networks:
+      - app-network
+    ports:
+      - '3000:3000'
+    env_file:
+      - ./backend/.env
+    environment:
+      - DB_HOST=postgres
+      - REDIS_HOST=redis
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./backend:/usr/src/app
+      - /usr/src/app/node_modules
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  redis_data:

@@ -1,3 +1,4 @@
-node_modules/
+node_modules
+backend/dist
+backend/coverage
 .env
-.DS_Store
