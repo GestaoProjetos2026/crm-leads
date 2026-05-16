@@ -18,7 +18,11 @@ import { AuditModule } from './modules/audit/audit.module';
 import { StagesModule } from './modules/stages/stages.module';
 import { CampaignsModule } from './modules/campaigns/campaigns.module';
 import { WorkerModule } from './modules/worker/worker.module';
-import type { TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { Lead } from './modules/leads/entities/lead.entity';
+import { Opportunity } from './modules/opportunities/entities/opportunity.entity';
+import { Tenant } from './modules/tenants/entities/tenant.entity';
+import { AuditLog } from './modules/leads/entities/audit-log.entity';
+import { LeadStatusHistory } from './modules/leads/entities/lead-status-history.entity';
 
 @Module({
   imports: [
@@ -34,6 +38,7 @@ import type { TypeOrmModuleOptions } from '@nestjs/typeorm';
     // TypeORM connected via ConfigService so credentials come from .env
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
+      entities: [Tenant, Lead, Opportunity, AuditLog, LeadStatusHistory],
       useFactory: (config: ConfigService): TypeOrmModuleOptions =>
         config.get<TypeOrmModuleOptions>('database') as TypeOrmModuleOptions,
     }),
