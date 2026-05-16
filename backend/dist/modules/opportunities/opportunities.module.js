@@ -10,6 +10,7 @@ exports.OpportunitiesModule = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const opportunity_entity_1 = require("./entities/opportunity.entity");
+const stage_transition_log_entity_1 = require("./entities/stage-transition-log.entity");
 const opportunities_service_1 = require("./opportunities.service");
 const opportunities_controller_1 = require("./opportunities.controller");
 let OpportunitiesModule = class OpportunitiesModule {
@@ -17,10 +18,10 @@ let OpportunitiesModule = class OpportunitiesModule {
 exports.OpportunitiesModule = OpportunitiesModule;
 exports.OpportunitiesModule = OpportunitiesModule = __decorate([
     (0, common_1.Module)({
-        imports: [typeorm_1.TypeOrmModule.forFeature([opportunity_entity_1.Opportunity])],
+        imports: [typeorm_1.TypeOrmModule.forFeature([opportunity_entity_1.Opportunity, stage_transition_log_entity_1.StageTransitionLog])],
         controllers: [opportunities_controller_1.OpportunitiesController],
         providers: [opportunities_service_1.OpportunitiesService],
-        exports: [opportunities_service_1.OpportunitiesService],
+        exports: [opportunities_service_1.OpportunitiesService, typeorm_1.TypeOrmModule],
     })
 ], OpportunitiesModule);
 //# sourceMappingURL=opportunities.module.js.map

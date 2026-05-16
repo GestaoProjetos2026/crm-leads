@@ -94,27 +94,27 @@ Todos os disparos externos (WhatsApp, e-mail, webhooks) são enfileirados em uma
 │ POST ingest │  │ Cache Redis (P95<300ms)│  │ Disparo WhatsApp/Mail│
 │ Kanban API  │  │ CTEs + Agregados       │  │ Retry Logic          │
 └──────┬──────┘  └───────────┬────────────┘  └──────────┬───────────┘
-       │                     │                           │
-       └─────────────────────┼───────────────────────────┘
+       │                     │                          │
+       └─────────────────────┼──────────────────────────┘
                              │
        ┌─────────────────────▼───────────────────────────┐
-       │                 CAMADA DE DADOS                  │
-       │                                                  │
+       │                 CAMADA DE DADOS                 │
+       │                                                 │
        │  PostgreSQL (RLS ativo) │ Redis (Cache/Filas)   │
-       │  Isolamento por tenant  │ TTL configurável       │
+       │  Isolamento por tenant  │ TTL configurável      │
        └────────────────────────┬────────────────────────┘
                                 │
        ┌────────────────────────▼────────────────────────┐
-       │          PROCESSAMENTO EM BACKGROUND             │
-       │                                                  │
+       │          PROCESSAMENTO EM BACKGROUND            │
+       │                                                 │
        │  Worker: Detecção de Estagnação 48h (Cron)      │
        │  Worker: Marcação de Inatividade 180d (Cron)    │
        │  Worker: Consumidor de Fila (Webhooks/Automação)│
        └────────────────────────┬────────────────────────┘
                                 │
        ┌────────────────────────▼────────────────────────┐
-       │           MESSAGE QUEUE (RabbitMQ / SQS)         │
-       │                                                  │
+       │           MESSAGE QUEUE (RabbitMQ / SQS)        │
+       │                                                 │
        │  Fila: lead.stagnated                           │
        │  Fila: lead.inactive                            │
        │  Fila: campaign.low_conversion                  │
@@ -133,9 +133,9 @@ Camada de apresentação 100% web, sem aplicativo mobile no MVP. Responsável po
 
 **Requisito técnico crítico:** O dashboard do SDR deve atualizar o Kanban em **tempo real** via WebSocket ou polling curto (< 5s), refletindo leads recém-estagnados sem recarregamento de página. Isso é viabilizado pela conexão direta ao API Gateway via WebSocket, com eventos emitidos pelo Serviço de CRM ao detectar mudanças de estado.
 
-![Alt text](docs\imgs\home.png "home")
-![Alt text](docs\imgs\Gargalos.png "Gargalos")
-![Alt text](docs\imgs\Latencia.png "Latencia")
+![Alt text](docs/imgs/home.png "home")
+![Alt text](docs/imgs/Gargalos.png "Gargalos")
+![Alt text](docs/imgs/Latencia.png "Latencia")
 
 ### 4.2 API Gateway
 

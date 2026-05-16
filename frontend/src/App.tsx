@@ -1,7 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Routes, Route, Navigate, Link, useLocation, useNavigate } from 'react-router-dom';
 import BottlenecksPage from './pages/BottlenecksPage';
 import ConversionLatencyPage from './pages/ConversionLatencyPage';
+import FunnelPage from './pages/FunnelPage';
+import { Lead, LeadService } from './services/LeadService';
 import logo from './assets/logo.svg';
 import { MdBarChart, MdPeople, MdWarning, MdSchedule, MdSettings, MdExitToApp, MdTrackChanges, MdArrowForward, MdAttachMoney } from 'react-icons/md';
 
@@ -29,7 +31,7 @@ const LoginScreen = () => {
 
     try {
       // 1. Tenta autenticar no backend real (NestJS)
-      const response = await fetch('http://localhost:3000/v1/auth/login', {
+      const response = await fetch('http://localhost:3031/v1/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -168,6 +170,7 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
   const navItems = [
     { path: '/dashboard', label: 'Painel', icon: <MdBarChart size={16} /> },
     { path: '/leads', label: 'Leads', icon: <MdPeople size={16} /> },
+    { path: '/funnel', label: 'Funil', icon: <MdTrackChanges size={16} /> },
     { path: '/bottlenecks', label: 'Gargalos', icon: <MdWarning size={16} /> },
     { path: '/conversion-latency', label: 'Latência', icon: <MdSchedule size={16} /> },
     { path: '/settings', label: 'Configurações', icon: <MdSettings size={16} /> },
@@ -434,23 +437,29 @@ const SettingsPlaceholder = ({
   </MainLayout>
 );
 
-const mockLeads = [
-  { id: 1, firstName: 'João', lastName: 'Silva', email: 'joao.silva@empresa.com', source: 'facebook_leads', isInactive: false, createdAt: new Date('2026-04-20T10:00:00') },
-  { id: 2, firstName: 'Maria', lastName: 'Oliveira', email: 'maria.oliveira@startup.io', source: 'landing_page', isInactive: false, createdAt: new Date('2026-04-21T14:30:00') },
-  { id: 3, firstName: 'Carlos', lastName: 'Souza', email: 'carlos.souza@gmail.com', source: 'organic', isInactive: true, createdAt: new Date('2025-10-15T09:15:00') },
-  { id: 4, firstName: 'Ana', lastName: 'Costa', email: 'ana.costa@techsol.com', source: 'linkedin_ads', isInactive: false, createdAt: new Date('2026-04-23T11:45:00') },
-  { id: 5, firstName: 'Pedro', lastName: 'Almeida', email: 'pedro.almeida@hotmail.com', source: 'facebook_leads', isInactive: true, createdAt: new Date('2025-08-05T16:20:00') },
-  { id: 6, firstName: 'Anna', lastName: 'Nunes', email: 'annanunesc04@gmail.com', source: 'organic', isInactive: true, createdAt: new Date('2025-08-05T16:20:00') },
-
-];
-
 const LeadsScreen = ({ viewMode }: { viewMode: string }) => {
+  const [leads, setLeads] = useState<Lead[]>([]);
+  const [loading, setLoading] = useState(true);
   const [showFilters, setShowFilters] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [sourceFilter, setSourceFilter] = useState('all');
 
-  const filteredLeads = mockLeads.filter(lead => {
+  useEffect(() => {
+    const fetchLeads = async () => {
+      try {
+        const data = await LeadService.getLeads();
+        setLeads(data);
+      } catch (error) {
+        console.error('Failed to fetch leads:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchLeads();
+  }, []);
+
+  const filteredLeads = leads.filter(lead => {
     const matchesSearch =
       `${lead.firstName} ${lead.lastName}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
       lead.email.toLowerCase().includes(searchTerm.toLowerCase());
@@ -524,7 +533,9 @@ const LeadsScreen = ({ viewMode }: { viewMode: string }) => {
         </div>
       )}
 
-      {viewMode === 'table' ? (
+      {loading ? (
+        <div style={{ color: 'var(--text-secondary)' }}>Carregando leads...</div>
+      ) : viewMode === 'table' ? (
         <div className="glass-panel data-table-container">
           <table className="data-table">
             <thead>
@@ -549,7 +560,7 @@ const LeadsScreen = ({ viewMode }: { viewMode: string }) => {
                   </td>
                   <td>
                     <span style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
-                      {lead.createdAt.toLocaleDateString('pt-BR')}
+                      {new Date(lead.createdAt).toLocaleDateString('pt-BR')}
                     </span>
                   </td>
                   <td>
@@ -589,7 +600,7 @@ const LeadsScreen = ({ viewMode }: { viewMode: string }) => {
                 </span>
               </div>
               <div className="lead-card-footer">
-                <span>Criado em {lead.createdAt.toLocaleDateString('pt-BR')}</span>
+                <span>Criado em {new Date(lead.createdAt).toLocaleDateString('pt-BR')}</span>
                 <button className="btn btn-secondary" style={{ padding: '0.25rem 0.5rem', fontSize: '0.875rem' }}>Abrir</button>
               </div>
             </div>
@@ -618,6 +629,7 @@ function App() {
         <Route path="/login" element={<LoginScreen />} />
         <Route path="/dashboard" element={<DashboardOverview />} />
         <Route path="/leads" element={<LeadsScreen viewMode={leadsViewMode} />} />
+        <Route path="/funnel" element={<MainLayout><FunnelPage /></MainLayout>} />
         <Route path="/bottlenecks" element={<MainLayout><BottlenecksPage /></MainLayout>} />
         <Route path="/conversion-latency" element={<MainLayout><ConversionLatencyPage /></MainLayout>} />
         <Route

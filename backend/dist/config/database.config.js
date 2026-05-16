@@ -16,7 +16,7 @@ exports.default = (0, config_1.registerAs)('database', () => ({
     extra: {
         application_name: 'salesweakness-api',
         max: 20,
-        idleTimeoutMillis: 30000,
+        idleTimeoutMillis: 30310,
         connectionTimeoutMillis: 5000,
     },
 }));

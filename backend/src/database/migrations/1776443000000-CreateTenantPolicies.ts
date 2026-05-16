@@ -1,6 +1,6 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class CreateTenantPolicies1776443000000 implements MigrationInterface {
+export class CreateTenantPolicies1776443031000 implements MigrationInterface {
     public async up(queryRunner: QueryRunner): Promise<void> {
         // Política de isolamento para Leads
         await queryRunner.query(`

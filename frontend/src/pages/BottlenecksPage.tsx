@@ -30,7 +30,7 @@ const MOCK_BOTTLENECKS: BottleneckItem[] = [
     leadName: 'Juliana Ferreira', leadEmail: 'juliana@empresa.com',
     stageName: 'Fechamento', stageId: 5, weaknessType: 'Stagnation',
     description: 'Lead parado há 30h na etapa "Fechamento" (SLA: 24h). Valor em risco: R$ 30.000,00',
-    hoursStagnant: 30, value: 30000, detectedAt: new Date(Date.now() - 3600000 * 0.5).toISOString(),
+    hoursStagnant: 30, value: 30310, detectedAt: new Date(Date.now() - 3600000 * 0.5).toISOString(),
   },
 ];
 

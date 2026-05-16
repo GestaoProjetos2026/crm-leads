@@ -17,16 +17,40 @@ const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
 const opportunity_entity_1 = require("./entities/opportunity.entity");
+const stage_transition_log_entity_1 = require("./entities/stage-transition-log.entity");
 let OpportunitiesService = class OpportunitiesService {
     opportunitiesRepository;
-    constructor(opportunitiesRepository) {
+    transitionLogRepository;
+    constructor(opportunitiesRepository, transitionLogRepository) {
         this.opportunitiesRepository = opportunitiesRepository;
+        this.transitionLogRepository = transitionLogRepository;
+    }
+    async moveStage(tenantId, opportunityId, newStageId) {
+        const opportunity = await this.opportunitiesRepository.findOne({
+            where: { id: opportunityId, tenantId },
+        });
+        if (!opportunity) {
+            throw new common_1.NotFoundException(`Opportunity #${opportunityId} not found for tenant ${tenantId}`);
+        }
+        const fromStageId = opportunity.stageId;
+        opportunity.stageId = newStageId;
+        const saved = await this.opportunitiesRepository.save(opportunity);
+        const transitionLog = this.transitionLogRepository.create({
+            tenantId,
+            opportunityId,
+            fromStageId,
+            toStageId: newStageId,
+        });
+        await this.transitionLogRepository.save(transitionLog);
+        return saved;
     }
 };
 exports.OpportunitiesService = OpportunitiesService;
 exports.OpportunitiesService = OpportunitiesService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(opportunity_entity_1.Opportunity)),
-    __metadata("design:paramtypes", [typeorm_2.Repository])
+    __param(1, (0, typeorm_1.InjectRepository)(stage_transition_log_entity_1.StageTransitionLog)),
+    __metadata("design:paramtypes", [typeorm_2.Repository,
+        typeorm_2.Repository])
 ], OpportunitiesService);
 //# sourceMappingURL=opportunities.service.js.map

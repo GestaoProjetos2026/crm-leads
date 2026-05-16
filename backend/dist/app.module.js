@@ -13,6 +13,7 @@ exports.AppModule = void 0;
 const common_1 = require("@nestjs/common");
 const config_1 = require("@nestjs/config");
 const typeorm_1 = require("@nestjs/typeorm");
+const event_emitter_1 = require("@nestjs/event-emitter");
 const core_1 = require("@nestjs/core");
 const core_2 = require("@nestjs/core");
 const app_controller_1 = require("./app.controller");
@@ -39,6 +40,7 @@ exports.AppModule = AppModule = __decorate([
                 isGlobal: true,
                 load: [app_config_1.default, database_config_1.default, redis_config_1.default],
             }),
+            event_emitter_1.EventEmitterModule.forRoot(),
             typeorm_1.TypeOrmModule.forRootAsync({
                 inject: [config_1.ConfigService],
                 useFactory: (config) => config.get('database'),

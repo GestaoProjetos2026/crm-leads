@@ -194,4 +194,4 @@ VALUES
   (1, 2, 3, 45000.00, 'Open', NOW() - INTERVAL '96 hours'),  -- Stagnant in Negociação (SLA: 72h)
   (1, 3, 1, 8000.00, 'Open', NOW() - INTERVAL '2 hours'),    -- OK in Prospecção
   (1, 4, 4, 120000.00, 'Open', NOW() - INTERVAL '60 hours'), -- Stagnant in Proposta (SLA: 48h)
-  (1, 5, 5, 30000.00, 'Open', NOW() - INTERVAL '30 hours');  -- Stagnant in Fechamento (SLA: 24h)
+  (1, 5, 5, 30310.00, 'Open', NOW() - INTERVAL '30 hours');  -- Stagnant in Fechamento (SLA: 24h)

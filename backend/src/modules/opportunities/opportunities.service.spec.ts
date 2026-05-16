@@ -3,6 +3,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { OpportunitiesService } from './opportunities.service';
 import { Opportunity } from './entities/opportunity.entity';
+import { StageTransitionLog } from './entities/stage-transition-log.entity';
 
 describe('OpportunitiesService', () => {
   let service: OpportunitiesService;
@@ -14,6 +15,15 @@ describe('OpportunitiesService', () => {
         OpportunitiesService,
         {
           provide: getRepositoryToken(Opportunity),
+          useValue: {
+            find: jest.fn(),
+            findOne: jest.fn(),
+            save: jest.fn(),
+            create: jest.fn(),
+          },
+        },
+        {
+          provide: getRepositoryToken(StageTransitionLog),
           useValue: {
             find: jest.fn(),
             findOne: jest.fn(),

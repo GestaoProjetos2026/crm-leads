@@ -53,7 +53,7 @@ services:
     networks:
       - app-network
     ports:
-      - '3000:3000'
+      - '3031:3031'
     env_file:
       - ./backend/.env
     environment:

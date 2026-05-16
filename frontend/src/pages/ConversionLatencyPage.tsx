@@ -8,7 +8,7 @@ const MOCK_LATENCY: ConversionLatencyItem[] = [
   { stageId: 2, stageName: 'Qualificação', orderPosition: 2, avgHours: 38,  maxHours: 72,  minHours: 8,  totalOpportunities: 12, totalStagnant: 3, totalValueAtRisk: 45000 },
   { stageId: 3, stageName: 'Negociação',   orderPosition: 3, avgHours: 65,  maxHours: 120, minHours: 24, totalOpportunities: 8,  totalStagnant: 2, totalValueAtRisk: 85000 },
   { stageId: 4, stageName: 'Proposta',     orderPosition: 4, avgHours: 42,  maxHours: 96,  minHours: 12, totalOpportunities: 6,  totalStagnant: 1, totalValueAtRisk: 120000 },
-  { stageId: 5, stageName: 'Fechamento',   orderPosition: 5, avgHours: 18,  maxHours: 48,  minHours: 4,  totalOpportunities: 4,  totalStagnant: 1, totalValueAtRisk: 30000 },
+  { stageId: 5, stageName: 'Fechamento',   orderPosition: 5, avgHours: 18,  maxHours: 48,  minHours: 4,  totalOpportunities: 4,  totalStagnant: 1, totalValueAtRisk: 30310 },
 ];
 
 const STAGE_SLA: Record<number, number> = { 1: 24, 2: 48, 3: 72, 4: 48, 5: 24 };
