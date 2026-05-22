@@ -109,19 +109,110 @@ jobs:
     runs-on: ubuntu-latest
     if: success()
 
-    uses: GestaoProjetos2026/pipeline-centralizado/.github/workflows/pipeline2.yaml@main
-    secrets:
-      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-      DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
-      GH_TOKEN: ${{ secrets.GH_TOKEN }}
-      GH_EMAIL: ${{ secrets.GH_EMAIL }}
-      ARGOCD_SERVER: ${{ secrets.ARGOCD_SERVER }}
-      ARGOCD_USERNAME: ${{ secrets.ARGOCD_USERNAME }}
-      ARGOCD_PASSWORD: ${{ secrets.ARGOCD_PASSWORD }}
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Generate Backend Deployment
+        run: |
+          mkdir -p /tmp/k8s
+          cat > /tmp/k8s/backend-deployment.yaml << 'YAML_EOF'
+          apiVersion: apps/v1
+          kind: Deployment
+          metadata:
+            name: crm-leads-backend
+            labels:
+              app: crm-leads-backend
+          spec:
+            replicas: 3
+            selector:
+              matchLabels:
+                app: crm-leads-backend
+            template:
+              metadata:
+                labels:
+                  app: crm-leads-backend
+              spec:
+                containers:
+                - name: backend
+                  image: ${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE }}:latest
+                  ports:
+                  - containerPort: 3000
+                  env:
+                  - name: NODE_ENV
+                    value: "production"
+                  - name: PORT
+                    value: "3000"
+                  resources:
+                    requests:
+                      memory: "256Mi"
+                      cpu: "250m"
+                    limits:
+                      memory: "512Mi"
+                      cpu: "500m"
+          ---
+          apiVersion: v1
+          kind: Service
+          metadata:
+            name: crm-leads-backend-service
+          spec:
+            type: ClusterIP
+            selector:
+              app: crm-leads-backend
+            ports:
+            - port: 80
+              targetPort: 3000
+          YAML_EOF
+
+      - name: Generate Frontend Deployment
+        run: |
+          cat > /tmp/k8s/frontend-deployment.yaml << 'YAML_EOF'
+          apiVersion: apps/v1
+          kind: Deployment
+          metadata:
+            name: crm-leads-frontend
+            labels:
+              app: crm-leads-frontend
+          spec:
+            replicas: 2
+            selector:
+              matchLabels:
+                app: crm-leads-frontend
+            template:
+              metadata:
+                labels:
+                  app: crm-leads-frontend
+              spec:
+                containers:
+                - name: frontend
+                  image: ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE }}:latest
+                  ports:
+                  - containerPort: 80
+                  env:
+                  - name: NODE_ENV
+                    value: "production"
+                  resources:
+                    requests:
+                      memory: "128Mi"
+                      cpu: "100m"
+                    limits:
+                      memory: "256Mi"
+                      cpu: "250m"
+          ---
+          apiVersion: v1
+          kind: Service
+          metadata:
+            name: crm-leads-frontend-service
+          spec:
+            type: LoadBalancer
+            selector:
+              app: crm-leads-frontend
+            ports:
+            - port: 80
+              targetPort: 80
+            - port: 443
+              targetPort: 80
+          YAML_EOF
 
       - name: Configure SSH key
         run: |
@@ -130,115 +221,140 @@ jobs:
           chmod 600 ~/.ssh/deploy_key
           ssh-keyscan -H ${{ env.DEPLOY_HOST }} >> ~/.ssh/known_hosts 2>/dev/null || true
 
-      - name: Push .env to production
-        run: |
-          scp -i ~/.ssh/deploy_key \
-            -P 22 \
-            backend/.env \
-            ${{ env.DEPLOY_USER }}@${{ env.DEPLOY_HOST }}:~/salesweakness/backend/.env
-
-      - name: Deploy containers
+      - name: Deploy to Kubernetes
         run: |
           ssh -i ~/.ssh/deploy_key \
             -o StrictHostKeyChecking=no \
             ${{ env.DEPLOY_USER }}@${{ env.DEPLOY_HOST }} << 'EOF'
+          
           set -e
-
-          REGISTRY="${{ env.REGISTRY }}"
-          BACKEND_IMAGE="${{ env.BACKEND_IMAGE }}"
-          FRONTEND_IMAGE="${{ env.FRONTEND_IMAGE }}"
-          BACKEND_CONTAINER="${{ env.BACKEND_CONTAINER }}"
-          FRONTEND_CONTAINER="${{ env.FRONTEND_CONTAINER }}"
-          BACKEND_PORT="${{ env.BACKEND_PORT }}"
-          FRONTEND_PORT="${{ env.FRONTEND_PORT }}"
-          ENV_FILE="$HOME/salesweakness/backend/.env"
-
-          BACKEND_IMG="${REGISTRY}/${BACKEND_IMAGE}:latest"
-          FRONTEND_IMG="${REGISTRY}/${FRONTEND_IMAGE}:latest"
-
-          echo "Starting deployment..."
-          echo "Backend: $BACKEND_IMG"
-          echo "Frontend: $FRONTEND_IMG"
-
-          # Login to Docker Hub if credentials provided
-          if [ -n "${{ secrets.DOCKER_USERNAME }}" ] && [ -n "${{ secrets.DOCKER_PASSWORD }}" ]; then
-            echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
-          fi
-
-          # Pull latest images
-          echo "Pulling images..."
-          docker pull "$BACKEND_IMG"
-          docker pull "$FRONTEND_IMG"
-
-          # ===== BACKEND =====
-          echo ""
-          echo "Deploying Backend..."
-          if docker ps -a --format '{{.Names}}' | grep -q "^${BACKEND_CONTAINER}$"; then
-            echo "Stopping existing backend container: $BACKEND_CONTAINER"
-            docker stop "$BACKEND_CONTAINER" || true
-            docker rm "$BACKEND_CONTAINER" || true
-            sleep 1
-          fi
-
-          echo "Starting backend container..."
-          docker run -d \
-            --name "$BACKEND_CONTAINER" \
-            --restart unless-stopped \
-            -p "${BACKEND_PORT}:3031" \
-            --env-file "$ENV_FILE" \
-            --network salesweakness \
-            -e DB_HOST=salesweakness-db \
-            -e REDIS_HOST=salesweakness-redis \
-            "$BACKEND_IMG"
-
-          sleep 2
-          if docker ps --format '{{.Names}}' | grep -q "^${BACKEND_CONTAINER}$"; then
-            echo "✓ Backend deployed successfully!"
-          else
-            echo "✗ Backend failed to start"
-            docker logs "$BACKEND_CONTAINER" || true
-            exit 1
-          fi
-
-          # ===== FRONTEND =====
-          echo ""
-          echo "Deploying Frontend..."
-          if docker ps -a --format '{{.Names}}' | grep -q "^${FRONTEND_CONTAINER}$"; then
-            echo "Stopping existing frontend container: $FRONTEND_CONTAINER"
-            docker stop "$FRONTEND_CONTAINER" || true
-            docker rm "$FRONTEND_CONTAINER" || true
-            sleep 1
-          fi
-
-          echo "Starting frontend container..."
-          docker run -d \
-            --name "$FRONTEND_CONTAINER" \
-            --restart unless-stopped \
-            -p "${FRONTEND_PORT}:3032" \
-            --network salesweakness \
-            "$FRONTEND_IMG"
-
-          sleep 2
-          if docker ps --format '{{.Names}}' | grep -q "^${FRONTEND_CONTAINER}$"; then
-            echo "✓ Frontend deployed successfully!"
-          else
-            echo "✗ Frontend failed to start"
-            docker logs "$FRONTEND_CONTAINER" || true
-            exit 1
-          fi
-
-          # Summary
-          echo ""
-          echo "========================================="
+          
+          echo "Creating namespaces and applying deployments..."
+          
+          # Create namespace if it doesn't exist
+          kubectl create namespace crm-leads --dry-run=client -o yaml | kubectl apply -f -
+          
+          # Apply backend deployment
+          cat << 'BACKEND_YAML' | kubectl apply -f - -n crm-leads
+          apiVersion: apps/v1
+          kind: Deployment
+          metadata:
+            name: crm-leads-backend
+            labels:
+              app: crm-leads-backend
+          spec:
+            replicas: 3
+            selector:
+              matchLabels:
+                app: crm-leads-backend
+            template:
+              metadata:
+                labels:
+                  app: crm-leads-backend
+              spec:
+                containers:
+                - name: backend
+                  image: ${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE }}:latest
+                  imagePullPolicy: IfNotPresent
+                  ports:
+                  - containerPort: 3000
+                  env:
+                  - name: NODE_ENV
+                    value: "production"
+                  - name: PORT
+                    value: "3000"
+                  resources:
+                    requests:
+                      memory: "256Mi"
+                      cpu: "250m"
+                    limits:
+                      memory: "512Mi"
+                      cpu: "500m"
+                  livenessProbe:
+                    httpGet:
+                      path: /health
+                      port: 3000
+                    initialDelaySeconds: 30
+                    periodSeconds: 10
+          ---
+          apiVersion: v1
+          kind: Service
+          metadata:
+            name: crm-leads-backend-service
+          spec:
+            type: ClusterIP
+            selector:
+              app: crm-leads-backend
+            ports:
+            - port: 80
+              targetPort: 3000
+              name: http
+          BACKEND_YAML
+          
+          # Apply frontend deployment
+          cat << 'FRONTEND_YAML' | kubectl apply -f - -n crm-leads
+          apiVersion: apps/v1
+          kind: Deployment
+          metadata:
+            name: crm-leads-frontend
+            labels:
+              app: crm-leads-frontend
+          spec:
+            replicas: 2
+            selector:
+              matchLabels:
+                app: crm-leads-frontend
+            template:
+              metadata:
+                labels:
+                  app: crm-leads-frontend
+              spec:
+                containers:
+                - name: frontend
+                  image: ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE }}:latest
+                  imagePullPolicy: IfNotPresent
+                  ports:
+                  - containerPort: 80
+                  env:
+                  - name: NODE_ENV
+                    value: "production"
+                  resources:
+                    requests:
+                      memory: "128Mi"
+                      cpu: "100m"
+                    limits:
+                      memory: "256Mi"
+                      cpu: "250m"
+                  livenessProbe:
+                    httpGet:
+                      path: /
+                      port: 80
+                    initialDelaySeconds: 20
+                    periodSeconds: 10
+          ---
+          apiVersion: v1
+          kind: Service
+          metadata:
+            name: crm-leads-frontend-service
+          spec:
+            type: LoadBalancer
+            selector:
+              app: crm-leads-frontend
+            ports:
+            - port: 80
+              targetPort: 80
+              name: http
+            - port: 443
+              targetPort: 80
+              name: https
+          FRONTEND_YAML
+          
+          echo "Waiting for deployments to be ready..."
+          kubectl rollout status deployment/crm-leads-backend -n crm-leads --timeout=5m
+          kubectl rollout status deployment/crm-leads-frontend -n crm-leads --timeout=5m
+          
           echo "✓ Deployment completed successfully!"
-          echo "========================================="
-          docker ps -a --filter "name=salesweakness-"
-          echo ""
-          echo "Backend:  http://localhost:${BACKEND_PORT} (API)"
-          echo "Frontend: http://localhost:${FRONTEND_PORT} (Web)"
-
-          # Cleanup
-          docker logout || true
+          kubectl get deployments,services -n crm-leads
           EOF
 
       - name: Cleanup SSH key
@@ -249,12 +365,12 @@ jobs:
       - name: Deployment Status
         if: success()
         run: |
-          echo "✓ Deployment to ${{ env.DEPLOY_HOST }} completed successfully!"
+          echo "✓ Deployment completed successfully!"
           echo "Backend: ${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE }}:latest"
           echo "Frontend: ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE }}:latest"
 
       - name: Deployment Failed
         if: failure()
         run: |
-          echo "✗ Deployment failed. Please check the logs above."
+          echo "✗ Deployment failed. Check the logs above."
           exit 1
