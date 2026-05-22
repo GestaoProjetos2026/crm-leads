@@ -1,5 +1,4 @@
-import axios, { AxiosResponse } from 'axios';
-import { mockLeadsData, mockOpportunitiesData } from './mocks/mockData';
+import axios from 'axios';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3031/v1';
 
@@ -11,44 +10,11 @@ const api = axios.create({
   },
 });
 
-// Request interceptor: attach JWT if available and apply mocks
+// Request interceptor: attach JWT if available
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('sw_token');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
-  }
-
-  // --- Mock Interceptors ---
-  if (config.url?.startsWith('/leads')) {
-    config.adapter = async () => {
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          resolve({
-            data: mockLeadsData,
-            status: 200,
-            statusText: 'OK',
-            headers: {},
-            config,
-          } as AxiosResponse);
-        }, 600); // simulate network latency
-      });
-    };
-  }
-
-  if (config.url?.startsWith('/opportunities')) {
-    config.adapter = async () => {
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          resolve({
-            data: mockOpportunitiesData,
-            status: 200,
-            statusText: 'OK',
-            headers: {},
-            config,
-          } as AxiosResponse);
-        }, 600); // simulate network latency
-      });
-    };
   }
 
   return config;
@@ -94,11 +60,11 @@ export interface ConversionLatencyItem {
 }
 
 export const auditApi = {
-  getBottlenecks: (companyId: number) =>
-    api.get<BottleneckItem[]>(`/audit/bottlenecks?companyId=${companyId}`),
+  getBottlenecks: () =>
+    api.get<BottleneckItem[]>(`/audit/bottlenecks`),
 
-  getConversionLatency: (companyId: number) =>
-    api.get<ConversionLatencyItem[]>(`/audit/conversion-latency?companyId=${companyId}`),
+  getConversionLatency: () =>
+    api.get<ConversionLatencyItem[]>(`/audit/conversion-latency`),
 };
 
 export const authApi = {

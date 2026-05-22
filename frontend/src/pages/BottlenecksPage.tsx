@@ -69,7 +69,7 @@ const BottlenecksPage: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await auditApi.getBottlenecks(1);
+      const response = await auditApi.getBottlenecks();
       if (response.data.length === 0) {
         setBottlenecks(MOCK_BOTTLENECKS);
         setUseMock(true);

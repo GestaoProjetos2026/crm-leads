@@ -8,7 +8,12 @@ import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { TenantContextInterceptor } from './common/interceptors/tenant-context.interceptor';
 import { setupSwagger } from './swagger.config.js';
 
+import { applyRLSPatch } from './database/rls.plugin';
+
 async function bootstrap() {
+  // Inicializa o patch no TypeORM antes de instanciar a conexão
+  applyRLSPatch();
+
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
 
