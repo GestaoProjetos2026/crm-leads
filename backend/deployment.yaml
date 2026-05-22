@@ -1,0 +1,182 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: crm-leads-backend
+  namespace: default
+  labels:
+    app: crm-leads-backend
+    version: v1
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: crm-leads-backend
+  template:
+    metadata:
+      labels:
+        app: crm-leads-backend
+        version: v1
+    spec:
+      serviceAccountName: crm-leads-backend
+      containers:
+      - name: backend
+        image: crm-leads/backend:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 3000
+          name: http
+          protocol: TCP
+        env:
+        - name: NODE_ENV
+          value: "production"
+        - name: PORT
+          value: "3000"
+        - name: DATABASE_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: crm-leads-config
+              key: database.host
+        - name: DATABASE_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: crm-leads-config
+              key: database.port
+        - name: DATABASE_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: crm-leads-config
+              key: database.name
+        - name: DATABASE_USER
+          valueFrom:
+            secretKeyRef:
+              name: crm-leads-secrets
+              key: database.user
+        - name: DATABASE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: crm-leads-secrets
+              key: database.password
+        - name: REDIS_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: crm-leads-config
+              key: redis.host
+        - name: REDIS_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: crm-leads-config
+              key: redis.port
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: crm-leads-secrets
+              key: jwt.secret
+        - name: JWT_EXPIRATION
+          value: "24h"
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 2
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 1000
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+              - ALL
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - crm-leads-backend
+              topologyKey: kubernetes.io/hostname
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: crm-leads-backend-service
+  namespace: default
+  labels:
+    app: crm-leads-backend
+spec:
+  type: ClusterIP
+  selector:
+    app: crm-leads-backend
+  ports:
+  - port: 80
+    targetPort: 3000
+    protocol: TCP
+    name: http
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: crm-leads-backend-hpa
+  namespace: default
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: crm-leads-backend
+  minReplicas: 3
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: crm-leads-backend-pdb
+  namespace: default
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: crm-leads-backend
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: crm-leads-backend
+  namespace: default

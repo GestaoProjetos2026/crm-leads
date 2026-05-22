@@ -1,0 +1,185 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: crm-leads-frontend
+  namespace: default
+  labels:
+    app: crm-leads-frontend
+    version: v1
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: crm-leads-frontend
+  template:
+    metadata:
+      labels:
+        app: crm-leads-frontend
+        version: v1
+    spec:
+      serviceAccountName: crm-leads-frontend
+      containers:
+      - name: frontend
+        image: crm-leads/frontend:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 80
+          name: http
+          protocol: TCP
+        env:
+        - name: VITE_API_URL
+          valueFrom:
+            configMapKeyRef:
+              name: crm-leads-config
+              key: api.url
+        - name: VITE_API_TIMEOUT
+          value: "30000"
+        - name: NODE_ENV
+          value: "production"
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "250m"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 20
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 2
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 101
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+              - ALL
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - crm-leads-frontend
+              topologyKey: kubernetes.io/hostname
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: crm-leads-frontend-service
+  namespace: default
+  labels:
+    app: crm-leads-frontend
+spec:
+  type: LoadBalancer
+  selector:
+    app: crm-leads-frontend
+  ports:
+  - port: 80
+    targetPort: 80
+    protocol: TCP
+    name: http
+  - port: 443
+    targetPort: 80
+    protocol: TCP
+    name: https
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: crm-leads-frontend-hpa
+  namespace: default
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: crm-leads-frontend
+  minReplicas: 2
+  maxReplicas: 5
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 75
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 85
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: crm-leads-frontend-pdb
+  namespace: default
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: crm-leads-frontend
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: crm-leads-frontend
+  namespace: default
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: crm-leads-frontend-network-policy
+  namespace: default
+spec:
+  podSelector:
+    matchLabels:
+      app: crm-leads-frontend
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: ingress-nginx
+    ports:
+    - protocol: TCP
+      port: 80
+  egress:
+  - to:
+    - namespaceSelector: {}
+    ports:
+    - protocol: TCP
+      port: 80
+    - protocol: TCP
+      port: 443
+  - to:
+    - podSelector:
+        matchLabels:
+          app: crm-leads-backend
+    ports:
+    - protocol: TCP
+      port: 80
