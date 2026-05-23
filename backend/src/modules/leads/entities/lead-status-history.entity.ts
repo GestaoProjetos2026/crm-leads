@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
-import { Tenant } from './tenant.entity';
+import { Tenant } from '../../tenants/entities/tenant.entity';
 import { Lead } from './lead.entity';
 
 @Entity('lead_status_history')

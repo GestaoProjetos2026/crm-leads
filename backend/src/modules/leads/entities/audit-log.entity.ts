@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
-import { Tenant } from './tenant.entity';
-import { Opportunity } from './opportunity.entity';
+import { Tenant } from '../../tenants/entities/tenant.entity';
+import { Opportunity } from '../../opportunities/entities/opportunity.entity';
 
 @Entity('audit_logs')
 export class AuditLog {

@@ -23,6 +23,7 @@ import { Opportunity } from './modules/opportunities/entities/opportunity.entity
 import { Tenant } from './modules/tenants/entities/tenant.entity';
 import { AuditLog } from './modules/leads/entities/audit-log.entity';
 import { LeadStatusHistory } from './modules/leads/entities/lead-status-history.entity';
+import { TypeOrmModuleOptions } from '@nestjs/typeorm'; 
 
 @Module({
   imports: [
@@ -38,7 +39,6 @@ import { LeadStatusHistory } from './modules/leads/entities/lead-status-history.
     // TypeORM connected via ConfigService so credentials come from .env
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
-      entities: [Tenant, Lead, Opportunity, AuditLog, LeadStatusHistory],
       useFactory: (config: ConfigService): TypeOrmModuleOptions =>
         config.get<TypeOrmModuleOptions>('database') as TypeOrmModuleOptions,
     }),
