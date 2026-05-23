@@ -11,7 +11,9 @@ const app_module_1 = require("./app.module");
 const http_exception_filter_1 = require("./common/filters/http-exception.filter");
 const tenant_context_interceptor_1 = require("./common/interceptors/tenant-context.interceptor");
 const swagger_config_js_1 = require("./swagger.config.js");
+const rls_plugin_1 = require("./database/rls.plugin");
 async function bootstrap() {
+    (0, rls_plugin_1.applyRLSPatch)();
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
     const configService = app.get(config_1.ConfigService);
     app.use((0, helmet_1.default)());

@@ -16,66 +16,53 @@ exports.AuditController = void 0;
 const common_1 = require("@nestjs/common");
 const swagger_1 = require("@nestjs/swagger");
 const audit_service_1 = require("./audit.service");
-const public_decorator_1 = require("../../common/decorators/public.decorator");
+const tenant_decorator_1 = require("../../common/decorators/tenant.decorator");
 let AuditController = class AuditController {
     auditService;
     constructor(auditService) {
         this.auditService = auditService;
     }
-    async getBottlenecks(companyId) {
-        return this.auditService.getBottlenecks(companyId);
+    async getBottlenecks(tenantId) {
+        return this.auditService.getBottlenecks(tenantId);
     }
-    async getConversionLatency(companyId) {
-        return this.auditService.getConversionLatency(companyId);
+    async getConversionLatency(tenantId) {
+        return this.auditService.getConversionLatency(tenantId);
     }
 };
 exports.AuditController = AuditController;
 __decorate([
     (0, common_1.Get)('bottlenecks'),
-    (0, public_decorator_1.Public)(),
     (0, swagger_1.ApiOperation)({
         summary: 'List all detected bottlenecks (stagnant leads)',
         description: 'Returns leads that have been stuck in a pipeline stage beyond the configured SLA threshold.',
-    }),
-    (0, swagger_1.ApiQuery)({
-        name: 'companyId',
-        type: Number,
-        required: true,
-        description: 'Tenant/company ID',
     }),
     (0, swagger_1.ApiResponse)({
         status: 200,
         description: 'List of bottlenecks with lead and stage details',
     }),
-    __param(0, (0, common_1.Query)('companyId', common_1.ParseIntPipe)),
+    __param(0, (0, tenant_decorator_1.TenantId)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", Promise)
 ], AuditController.prototype, "getBottlenecks", null);
 __decorate([
     (0, common_1.Get)('conversion-latency'),
-    (0, public_decorator_1.Public)(),
     (0, swagger_1.ApiOperation)({
         summary: 'Get conversion latency per pipeline stage',
         description: 'Returns average, max, and min time per stage plus value-at-risk for stagnant opportunities.',
-    }),
-    (0, swagger_1.ApiQuery)({
-        name: 'companyId',
-        type: Number,
-        required: true,
-        description: 'Tenant/company ID',
     }),
     (0, swagger_1.ApiResponse)({
         status: 200,
         description: 'Conversion latency metrics per stage',
     }),
-    __param(0, (0, common_1.Query)('companyId', common_1.ParseIntPipe)),
+    __param(0, (0, tenant_decorator_1.TenantId)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", Promise)
 ], AuditController.prototype, "getConversionLatency", null);
 exports.AuditController = AuditController = __decorate([
     (0, swagger_1.ApiTags)('audit'),
+    (0, swagger_1.ApiBearerAuth)(),
     (0, common_1.Controller)('audit'),
     __metadata("design:paramtypes", [audit_service_1.AuditService])
 ], AuditController);
