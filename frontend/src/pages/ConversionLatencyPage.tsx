@@ -44,7 +44,7 @@ const ConversionLatencyPage: React.FC = () => {
   const loadLatency = async () => {
     setLoading(true);
     try {
-      const response = await auditApi.getConversionLatency(1);
+      const response = await auditApi.getConversionLatency();
       if (response.data.length === 0) {
         setLatency(MOCK_LATENCY);
         setUseMock(true);

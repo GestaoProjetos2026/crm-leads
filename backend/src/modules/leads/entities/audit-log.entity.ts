@@ -2,6 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, Jo
 import { Tenant } from '../../tenants/entities/tenant.entity';
 import { Opportunity } from '../../opportunities/entities/opportunity.entity';
 
+
 @Entity('audit_logs')
 export class AuditLog {
   @PrimaryGeneratedColumn()

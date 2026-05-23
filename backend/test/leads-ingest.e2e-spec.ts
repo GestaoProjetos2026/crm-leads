@@ -3,6 +3,7 @@ import { INestApplication, ValidationPipe } from '@nestjs/common';
 import supertest from 'supertest';
 import { AppModule } from '../src/app.module';
 import { DataSource } from 'typeorm';
+import { JwtService } from '@nestjs/jwt';
 import { StagnationWorker } from '../src/modules/worker/stagnation.worker';
 
 /**
@@ -18,6 +19,8 @@ import { StagnationWorker } from '../src/modules/worker/stagnation.worker';
 describe('Lead Ingest + Stagnation Worker E2E', () => {
   let app: INestApplication;
   let dataSource: DataSource;
+  let jwtService: JwtService;
+  let authToken: string;
 
   const API_KEY = process.env.INGEST_API_KEY || 'sw-dev-api-key-2026';
   const TENANT_ID = 1;
@@ -39,6 +42,15 @@ describe('Lead Ingest + Stagnation Worker E2E', () => {
 
     await app.init();
     dataSource = app.get(DataSource);
+    jwtService = app.get(JwtService);
+    
+    // Generate valid token for the test tenant
+    authToken = jwtService.sign({
+      sub: 1,
+      tenant_id: TENANT_ID,
+      profile: 'director',
+      scopes: ['analytics:read'],
+    });
   });
 
   afterAll(async () => {
@@ -150,7 +162,8 @@ describe('Lead Ingest + Stagnation Worker E2E', () => {
   describe('GET /v1/audit/bottlenecks', () => {
     it('should return bottlenecks for the tenant', async () => {
       const response = await supertest(app.getHttpServer())
-        .get(`/v1/audit/bottlenecks?companyId=${TENANT_ID}`);
+        .get(`/v1/audit/bottlenecks`)
+        .set('Authorization', `Bearer ${authToken}`);
 
       expect(response.status).toBe(200);
       expect(Array.isArray(response.body)).toBe(true);
@@ -160,7 +173,8 @@ describe('Lead Ingest + Stagnation Worker E2E', () => {
   describe('GET /v1/audit/conversion-latency', () => {
     it('should return conversion latency per stage', async () => {
       const response = await supertest(app.getHttpServer())
-        .get(`/v1/audit/conversion-latency?companyId=${TENANT_ID}`);
+        .get(`/v1/audit/conversion-latency`)
+        .set('Authorization', `Bearer ${authToken}`);
 
       expect(response.status).toBe(200);
       expect(Array.isArray(response.body)).toBe(true);

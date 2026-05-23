@@ -18,39 +18,6 @@ api.interceptors.request.use((config) => {
     config.headers.Authorization = `Bearer ${token}`;
   }
 
-  // --- Mock Interceptors ---
-  if (config.url?.startsWith('/leads')) {
-    config.adapter = async () => {
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          resolve({
-            data: mockLeadsData,
-            status: 200,
-            statusText: 'OK',
-            headers: {},
-            config,
-          } as AxiosResponse);
-        }, 600); // simulate network latency
-      });
-    };
-  }
-
-  if (config.url?.startsWith('/opportunities')) {
-    config.adapter = async () => {
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          resolve({
-            data: mockOpportunitiesData,
-            status: 200,
-            statusText: 'OK',
-            headers: {},
-            config,
-          } as AxiosResponse);
-        }, 600); // simulate network latency
-      });
-    };
-  }
-
   return config;
 });
 
@@ -94,11 +61,11 @@ export interface ConversionLatencyItem {
 }
 
 export const auditApi = {
-  getBottlenecks: (companyId: number) =>
-    api.get<BottleneckItem[]>(`/audit/bottlenecks?companyId=${companyId}`),
+  getBottlenecks: () =>
+    api.get<BottleneckItem[]>(`/audit/bottlenecks`),
 
-  getConversionLatency: (companyId: number) =>
-    api.get<ConversionLatencyItem[]>(`/audit/conversion-latency?companyId=${companyId}`),
+  getConversionLatency: () =>
+    api.get<ConversionLatencyItem[]>(`/audit/conversion-latency`),
 };
 
 export const authApi = {

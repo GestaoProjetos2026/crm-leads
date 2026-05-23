@@ -4,18 +4,10 @@ import BottlenecksPage from './pages/BottlenecksPage';
 import ConversionLatencyPage from './pages/ConversionLatencyPage';
 import FunnelPage from './pages/FunnelPage';
 import { Lead, LeadService } from './services/LeadService';
+import { authApi } from './services/api';
+import { isAxiosError } from 'axios';
 import logo from './assets/logo.svg';
 import { MdBarChart, MdPeople, MdWarning, MdSchedule, MdSettings, MdExitToApp, MdTrackChanges, MdArrowForward, MdAttachMoney } from 'react-icons/md';
-
-/**
- * Credenciais de demonstração aceitas pelo sistema.
- * Em produção, a autenticação é feita via JWT no backend.
- */
-const DEMO_USERS: Record<string, { password: string; name: string; profile: string }> = {
-  'diretor@demo.com': { password: 'admin123', name: 'Diretor Comercial', profile: 'director' },
-  'gestor@demo.com': { password: 'admin123', name: 'Gestor de Tráfego', profile: 'marketing_manager' },
-  'vendedor@demo.com': { password: 'admin123', name: 'Vendedor (SDR)', profile: 'sales_rep' },
-};
 
 const LoginScreen = () => {
   const navigate = useNavigate();
@@ -30,40 +22,37 @@ const LoginScreen = () => {
     setLoading(true);
 
     try {
-      // 1. Tenta autenticar no backend real (NestJS)
-      const response = await fetch('http://localhost:3031/v1/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
+      const response = await authApi.login(email, password);
+      const token = response.data.access_token;
+      
+      // Decodifica o JWT base64 para pegar o profile
+      const payloadBase64 = token.split('.')[1];
+      const payload = JSON.parse(atob(payloadBase64));
 
-      if (response.ok) {
-        const data = await response.json();
-        localStorage.setItem('sw_token', data.access_token);
-        localStorage.setItem('sw_user', JSON.stringify({ email }));
-        navigate('/dashboard');
-        return;
-      }
-    } catch {
-      // Backend indisponível — usa credenciais de demonstração
-    }
-
-    // 2. Fallback: valida com credenciais de demonstração
-    const demoUser = DEMO_USERS[email.toLowerCase()];
-    if (demoUser && password === demoUser.password) {
-      localStorage.setItem('sw_user', JSON.stringify({
+      localStorage.setItem('sw_token', token);
+      localStorage.setItem('sw_user', JSON.stringify({ 
         email,
-        name: demoUser.name,
-        profile: demoUser.profile,
+        name: email.split('@')[0],
+        profile: payload.profile || 'user'
       }));
-      setLoading(false);
+      
       navigate('/dashboard');
-      return;
+    } catch (err) {
+      setLoading(false);
+      if (isAxiosError(err)) {
+        if (!err.response) {
+          setError('Erro de conexão: Não foi possível alcançar o servidor.');
+        } else if (err.response.status === 401) {
+          setError('E-mail ou senha incorretos.');
+        } else if (err.response.status === 403) {
+          setError('Sua conta ou tenant está bloqueada.');
+        } else {
+          setError(`Erro ao fazer login: ${err.response.data?.message || err.message}`);
+        }
+      } else {
+        setError('Ocorreu um erro inesperado.');
+      }
     }
-
-    // 3. Credenciais inválidas
-    setLoading(false);
-    setError('E-mail ou senha incorretos. Tente com as credenciais de demonstração.');
   };
 
   return (
@@ -142,23 +131,7 @@ const LoginScreen = () => {
           </button>
         </form>
 
-        {/* Demo credentials hint */}
-        <div style={{
-          marginTop: '1.5rem',
-          padding: '0.875rem',
-          borderRadius: '8px',
-          background: 'rgba(59, 130, 246, 0.08)',
-          border: '1px solid rgba(59, 130, 246, 0.2)',
-        }}>
-          <p style={{ color: 'var(--accent-primary)', fontSize: '0.75rem', fontWeight: 600, marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-            🔑 Credenciais de Demonstração
-          </p>
-          <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-            <div><strong style={{ color: 'var(--text-primary)' }}>diretor@demo.com</strong> · senha: admin123</div>
-            <div><strong style={{ color: 'var(--text-primary)' }}>gestor@demo.com</strong> · senha: admin123</div>
-            <div><strong style={{ color: 'var(--text-primary)' }}>vendedor@demo.com</strong> · senha: admin123</div>
-          </div>
-        </div>
+
       </div>
     </div>
   );
