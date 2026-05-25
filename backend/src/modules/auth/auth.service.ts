@@ -81,4 +81,29 @@ export class AuthService {
     const derivedKey = (await scrypt(password, salt, 64)) as Buffer;
     return `${salt}:${derivedKey.toString('hex')}`;
   }
+
+  /**
+   * Cria um novo usuário, validando duplicidade de email e hash da senha.
+   */
+  async register(data: {
+    email: string;
+    password: string;
+    tenantId: number;
+    profile?: string;
+  }): Promise<User> {
+    const { email, password, tenantId, profile } = data;
+    // Verifica se já existe usuário com o mesmo email
+    const existing = await this.userRepository.findOne({ where: { email } });
+    if (existing) {
+      throw new Error('Usuário já existe com este email');
+    }
+    const passwordHash = await this.hashPassword(password);
+    const user = this.userRepository.create({
+      email,
+      passwordHash,
+      tenantId,
+      profile: profile || 'sales_rep',
+    });
+    return this.userRepository.save(user);
+  }
 }
