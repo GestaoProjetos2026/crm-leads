@@ -18,11 +18,6 @@ import { AuditModule } from './modules/audit/audit.module';
 import { StagesModule } from './modules/stages/stages.module';
 import { CampaignsModule } from './modules/campaigns/campaigns.module';
 import { WorkerModule } from './modules/worker/worker.module';
-import { Lead } from './modules/leads/entities/lead.entity';
-import { Opportunity } from './modules/opportunities/entities/opportunity.entity';
-import { Tenant } from './modules/tenants/entities/tenant.entity';
-import { AuditLog } from './modules/leads/entities/audit-log.entity';
-import { LeadStatusHistory } from './modules/leads/entities/lead-status-history.entity';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm'; 
 
 @Module({
