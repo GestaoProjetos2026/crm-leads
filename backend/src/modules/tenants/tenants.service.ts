@@ -13,4 +13,33 @@ export class TenantsService {
     @InjectRepository(Tenant)
     private readonly tenantsRepository: Repository<Tenant>,
   ) {}
+
+  /**
+   * Cria um novo tenant.
+   */
+  async create(data: {
+    name: string;
+    plan?: string;
+  }): Promise<Tenant> {
+    const tenant = this.tenantsRepository.create({
+      name: data.name,
+      plan: data.plan || 'starter',
+      isBlocked: false,
+    });
+    return this.tenantsRepository.save(tenant);
+  }
+
+  /**
+   * Busca um tenant pelo ID.
+   */
+  async findById(id: number): Promise<Tenant | null> {
+    return this.tenantsRepository.findOne({ where: { id } });
+  }
+
+  /**
+   * Lista todos os tenants.
+   */
+  async findAll(): Promise<Tenant[]> {
+    return this.tenantsRepository.find();
+  }
 }
