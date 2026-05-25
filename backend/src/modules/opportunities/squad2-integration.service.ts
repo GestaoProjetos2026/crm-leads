@@ -9,12 +9,15 @@ export class Squad2IntegrationService {
   constructor(private readonly httpService: HttpService) {}
 
   async getFaturamentoReal(): Promise<any[]> {
-    // Mock temporário para o front não quebrar enquanto não temos a URL
-    if (!process.env.SQUAD2_API_URL) {
+    // Chaveador explícito: Se a variável for 'true' ou se a URL não estiver configurada, usa o mock
+    const useMock = process.env.SQUAD2_USE_MOCK === 'true' || !process.env.SQUAD2_API_URL;
+
+    if (useMock) {
+      this.logger.log('Chaveador ativado: Utilizando dados mockados para o Squad 2.');
       return [
         {
           id: 999,
-          title: "Faturamento Mock Squad 2",
+          title: "Faturamento Integrado (Ambiente de Teste)",
           value: 45000,
           stageName: "Fechamento",
           leadName: "Cliente Teste",
@@ -24,11 +27,12 @@ export class Squad2IntegrationService {
     }
 
     try {
-      const response = await firstValueFrom(this.httpService.get(process.env.SQUAD2_API_URL));
+      this.logger.log(`Chaveador desativado: Buscando faturamento real em ${process.env.SQUAD2_API_URL}`);
+      const response = await firstValueFrom(this.httpService.get(process.env.SQUAD2_API_URL as string));
       return response.data;
     } catch (error) {
-      this.logger.error('Erro ao buscar faturamento do Squad 2', error);
-      return []; // Retorna um array vazio para não quebrar o map() do FrontEnd
+      this.logger.error('Erro ao conectar na API real do Squad 2. Retornando fallback vazio.', error);
+      return []; 
     }
   }
 }
