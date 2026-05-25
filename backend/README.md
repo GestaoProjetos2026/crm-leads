@@ -25,13 +25,32 @@
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
-## Project setup
+## Configurando o Projeto
+
+### Criando Banco de Dados Postgres
 
 ```bash
-$ npm install
+# Crie o usuário 
+$ CREATE USER salesweakness WITH PASSWORD 'salesweakness';
+$ ALTER USER salesweakness SUPERUSER;
+
+# Crie o banco de dados
+$ CREATE DATABASE sales_weakness;
 ```
 
-## Compile and run the project
+### Iniciando Aplicação
+
+```bash
+# Vá para a sua branch
+$ git checkout <seu-primeiro-nome>
+
+$ npm install
+
+# Para rodar este comando é necessário estar com o banco de dados postgres configurado na sua máquina
+$ npm run migration:run
+```
+
+## Compilação e Rodando o Projeto
 
 ```bash
 # development
@@ -44,7 +63,7 @@ $ npm run start:dev
 $ npm run start:prod
 ```
 
-## Run tests
+## Rodando Testes
 
 ```bash
 # unit tests
@@ -59,16 +78,16 @@ $ npm run test:cov
 
 ## Deployment
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
-```
+# Vá para a Branch de versionamento
+$ git checkout version
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+# Crie a tag com o versionamento correto
+$ git tag -a v2.X.X -m "Alguma Mensagem"
+
+# Publique a aplicação usando o github actions
+$ git push origin version v2.X.X
+```
 
 ## Resources
 
