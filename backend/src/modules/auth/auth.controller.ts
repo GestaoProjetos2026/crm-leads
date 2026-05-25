@@ -1,4 +1,4 @@
-import { Controller, Post, Body, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Post, Body, HttpCode, HttpStatus, HttpException } from '@nestjs/common';
 import { ApiTags, ApiBody, ApiResponse, ApiProperty } from '@nestjs/swagger';
 import { Public } from '../../common/decorators/public.decorator';
 import { AuthService } from './auth.service';
@@ -26,42 +26,19 @@ export class AuthController {
 
   @Post('login')
   @Public()
-  @HttpCode(HttpStatus.OK)
+  @HttpCode(HttpStatus.GONE)
   @ApiBody({
     type: LoginDto,
-    description: 'User login credentials',
-    examples: {
-      'valid-login': {
-        summary: 'Valid login example',
-        value: {
-          email: 'user@example.com',
-          password: 'password123',
-        },
-      },
-    },
+    description: 'DEPRECATED: User login credentials',
   })
   @ApiResponse({
-    status: 200,
-    description: 'Login successful',
-    type: LoginResponseDto,
-    examples: {
-      'success': {
-        summary: 'Successful login response',
-        value: {
-          access_token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
-        },
-      },
-    },
-  })
-  @ApiResponse({
-    status: 401,
-    description: 'Invalid credentials or blocked tenant',
-  })
-  @ApiResponse({
-    status: 403,
-    description: 'Tenant account blocked',
+    status: 410,
+    description: 'Login is now handled by Core Engine Authentication API',
   })
   async login(@Body() body: LoginDto): Promise<LoginResponseDto> {
-    return this.authService.login(body.email, body.password);
+    throw new HttpException(
+      'Authentication is now handled by the Core Engine API.',
+      HttpStatus.GONE,
+    );
   }
 }
