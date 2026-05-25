@@ -2,7 +2,7 @@
 
 > **Versão:** 1.0 | **Classificação:** Confidencial — Uso Interno
 > **Última atualização:** Março de 2026
-> **Elaborado por:** Engenharia de Software
+> **Elaborado por:** CRM LEADS
 
 ---
 
