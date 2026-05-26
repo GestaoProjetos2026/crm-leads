@@ -11,10 +11,10 @@ import { JwtStrategy } from './jwt.strategy';
 /**
  * AuthModule — registered globally in AppModule.
  * Imports PassportModule + JwtModule for authentication.
+ * JWT validation is now delegated to Core Engine via remote call.
  */
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User]),
     PassportModule,
     JwtModule.registerAsync({
       inject: [ConfigService],

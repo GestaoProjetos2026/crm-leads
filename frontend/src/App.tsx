@@ -23,9 +23,9 @@ const LoginScreen = () => {
 
     try {
       const response = await authApi.login(email, password);
-      const token = response.data.access_token;
+      const token = response.data.data.accessToken;
       
-      // Decodifica o JWT base64 para pegar o profile
+      // Decodifica o JWT base64 para pegar os roles (Core Engine JWT usa 'roles' em vez de 'profile')
       const payloadBase64 = token.split('.')[1];
       const payload = JSON.parse(atob(payloadBase64));
 
@@ -33,7 +33,7 @@ const LoginScreen = () => {
       localStorage.setItem('sw_user', JSON.stringify({ 
         email,
         name: email.split('@')[0],
-        profile: payload.profile || 'user'
+        profile: (payload.roles && payload.roles.length > 0) ? payload.roles[0] : 'user'
       }));
       
       navigate('/dashboard');
