@@ -282,20 +282,6 @@ const SettingsPlaceholder = ({
         </h3>
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--spacing-lg)' }}>
-          {/* 
-          <div>
-            <label style={{ display: 'block', color: 'var(--text-secondary)', marginBottom: 'var(--spacing-xs)', fontSize: '0.875rem' }}>Tema Padrão</label>
-            <select
-              value={theme}
-              onChange={(e) => setTheme(e.target.value)}
-              style={{ width: '100%', padding: 'var(--spacing-sm)', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-primary)', color: 'var(--text-primary)', outline: 'none' }}
-            >
-              <option value="dark">Modo Escuro (Dark)</option>
-              <option value="light">Modo Claro (Light)</option>
-            </select>
-          </div>
-          */}
-
           <div>
             <label style={{ display: 'block', color: 'var(--text-secondary)', marginBottom: 'var(--spacing-xs)', fontSize: '0.875rem' }}>Tamanho da Fonte</label>
             <select
