@@ -9,6 +9,7 @@ import { AppService } from './app.service';
 import appConfig from './config/app.config';
 import databaseConfig from './config/database.config';
 import redisConfig from './config/redis.config';
+import fiscalConfig from './config/fiscal.config';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { AuthModule } from './modules/auth/auth.module';
 import { TenantsModule } from './modules/tenants/tenants.module';
@@ -18,6 +19,7 @@ import { AuditModule } from './modules/audit/audit.module';
 import { StagesModule } from './modules/stages/stages.module';
 import { CampaignsModule } from './modules/campaigns/campaigns.module';
 import { WorkerModule } from './modules/worker/worker.module';
+import { FiscalModule } from './modules/fiscal/fiscal.module';
 import { Lead } from './modules/leads/entities/lead.entity';
 import { Opportunity } from './modules/opportunities/entities/opportunity.entity';
 import { Tenant } from './modules/tenants/entities/tenant.entity';
@@ -29,7 +31,7 @@ import { LeadStatusHistory } from './modules/leads/entities/lead-status-history.
     // Load all config namespaces globally so every module can inject them
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [appConfig, databaseConfig, redisConfig],
+      load: [appConfig, databaseConfig, redisConfig, fiscalConfig],
     }),
 
     // Event system for lead.stagnated and future domain events
@@ -51,6 +53,9 @@ import { LeadStatusHistory } from './modules/leads/entities/lead-status-history.
     AuditModule,
     StagesModule,
     CampaignsModule,
+
+    // Lead → Fiscal conversion (Squad 2)
+    FiscalModule,
 
     // Background workers (StagnationWorker with @Cron)
     WorkerModule,

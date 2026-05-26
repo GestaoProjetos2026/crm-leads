@@ -21,6 +21,7 @@ const app_service_1 = require("./app.service");
 const app_config_1 = __importDefault(require("./config/app.config"));
 const database_config_1 = __importDefault(require("./config/database.config"));
 const redis_config_1 = __importDefault(require("./config/redis.config"));
+const fiscal_config_1 = __importDefault(require("./config/fiscal.config"));
 const jwt_auth_guard_1 = require("./common/guards/jwt-auth.guard");
 const auth_module_1 = require("./modules/auth/auth.module");
 const tenants_module_1 = require("./modules/tenants/tenants.module");
@@ -30,6 +31,12 @@ const audit_module_1 = require("./modules/audit/audit.module");
 const stages_module_1 = require("./modules/stages/stages.module");
 const campaigns_module_1 = require("./modules/campaigns/campaigns.module");
 const worker_module_1 = require("./modules/worker/worker.module");
+const fiscal_module_1 = require("./modules/fiscal/fiscal.module");
+const lead_entity_1 = require("./modules/leads/entities/lead.entity");
+const opportunity_entity_1 = require("./modules/opportunities/entities/opportunity.entity");
+const tenant_entity_1 = require("./modules/tenants/entities/tenant.entity");
+const audit_log_entity_1 = require("./modules/leads/entities/audit-log.entity");
+const lead_status_history_entity_1 = require("./modules/leads/entities/lead-status-history.entity");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -38,11 +45,12 @@ exports.AppModule = AppModule = __decorate([
         imports: [
             config_1.ConfigModule.forRoot({
                 isGlobal: true,
-                load: [app_config_1.default, database_config_1.default, redis_config_1.default],
+                load: [app_config_1.default, database_config_1.default, redis_config_1.default, fiscal_config_1.default],
             }),
             event_emitter_1.EventEmitterModule.forRoot(),
             typeorm_1.TypeOrmModule.forRootAsync({
                 inject: [config_1.ConfigService],
+                entities: [tenant_entity_1.Tenant, lead_entity_1.Lead, opportunity_entity_1.Opportunity, audit_log_entity_1.AuditLog, lead_status_history_entity_1.LeadStatusHistory],
                 useFactory: (config) => config.get('database'),
             }),
             auth_module_1.AuthModule,
@@ -52,6 +60,7 @@ exports.AppModule = AppModule = __decorate([
             audit_module_1.AuditModule,
             stages_module_1.StagesModule,
             campaigns_module_1.CampaignsModule,
+            fiscal_module_1.FiscalModule,
             worker_module_1.WorkerModule,
         ],
         controllers: [app_controller_1.AppController],
