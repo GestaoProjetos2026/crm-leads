@@ -69,7 +69,8 @@ export const auditApi = {
 
 export const authApi = {
   login: (email: string, password: string) => {
-    const coreEngineUrl = import.meta.env.VITE_CORE_API_URL || 'http://api.core-engine.40.82.176.176.nip.io/v1';
+    // Redirecionando para o Proxy configurado no vite.config.ts
+    const coreEngineUrl = import.meta.env.VITE_CORE_API_URL || '/core-api/v1';
     return axios.post<{ success: boolean; data: { accessToken: string; refreshToken: string; tokenType: string; expiresIn: number } }>(
       `${coreEngineUrl}/auth/login`,
       { email, password }
