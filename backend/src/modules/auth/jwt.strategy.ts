@@ -2,6 +2,9 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-custom';
 import { ConfigService } from '@nestjs/config';
+import { Repository } from 'typeorm';
+import { User } from './entities/user.entity';
+import { InjectRepository } from '@nestjs/typeorm';
 
 /**
  * JwtStrategy — Remote Validation via Core Engine
@@ -18,7 +21,11 @@ import { ConfigService } from '@nestjs/config';
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   private readonly coreEngineUrl: string;
 
-  constructor(private readonly configService: ConfigService) {
+  constructor(
+    private readonly configService: ConfigService,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
+  ) {
     super();
     this.coreEngineUrl = this.configService.get<string>(
       'CORE_ENGINE_URL',
@@ -29,7 +36,13 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   async validate(req: Request): Promise<any> {
     const authHeader = (req.headers as any)['authorization'] as string | undefined;
 
-    if (!authHeader?.startsWith('Bearer ')) {
+    if (authHeader == undefined) 
+      throw new UnauthorizedException({
+        message: 'Missing Bearer token',
+        errorCode: 'AUTH_TOKEN_INVALID',
+      })
+
+    if (!authHeader.startsWith('Bearer ')) {
       throw new UnauthorizedException({
         message: 'Missing Bearer token',
         errorCode: 'AUTH_TOKEN_INVALID',
@@ -51,7 +64,14 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
         });
       }
 
-      const body = await response.json() as any;
+      const body = await response.json() as {
+        data: {
+          accessToken: string,
+          refreshToken: string,
+          tokenType: string, // "Bearer"
+          expiresIn: number  // 900
+        }
+      };
       profile = body.data;
     } catch (err) {
       if (err instanceof UnauthorizedException) throw err;
@@ -62,9 +82,8 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     }
 
     // TODO: Reativar após criar as tabelas locais e popular o banco de dados.
-    // const user = await this.userRepository.findOne({ where: { email: profile.email } });
-    // const tenantId = user?.tenantId ?? null;
-    const tenantId = 1; // TEMP: tenant fixo para testes enquanto o banco local não está populado
+    const user = await this.userRepository.findOne({ where: { email: profile.email } });
+    const tenantId = user?.tenantId ?? null;
 
     return {
       userId: profile.userId ?? profile.id,

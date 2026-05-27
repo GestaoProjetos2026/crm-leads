@@ -1,4 +1,4 @@
-import { Controller, Post, Body, HttpCode, HttpStatus, HttpException } from '@nestjs/common';
+import { Controller, Post, Body, HttpCode, HttpStatus, HttpException, NotImplementedException } from '@nestjs/common';
 import { ApiTags, ApiBody, ApiResponse, ApiProperty } from '@nestjs/swagger';
 import { IsString, IsNumber, IsIn } from 'class-validator';
 import { Public } from '../../common/decorators/public.decorator';
@@ -12,6 +12,11 @@ class LoginDto {
   @ApiProperty({ example: 'password123' })
   @IsString()
   password: string;
+
+  @ApiProperty({ example: 'core', description: 'Qual o tipo de login, se vai ser pelo `core` ou pelo `salesweakness`'})
+  @IsString()
+  @IsIn(['salesweakness', 'core'])
+  type: 'salesweakness' | 'core';
 }
 
 
@@ -31,7 +36,7 @@ class RegisterDto {
   @ApiProperty({ example: 'sales_rep', description: 'User profile (director | marketing_manager | sales_rep)' })
   @IsString()
   @IsIn(['sales_rep', 'director', 'marketing_manager'])
-  profile?: string;
+  profile?: 'sales_rep' | 'director' | 'marketing_manager';
 }
 
 class RegisterResponseDto {
@@ -100,19 +105,24 @@ export class AuthController {
 
   @Post('login')
   @Public()
-  @HttpCode(HttpStatus.GONE)
+  @HttpCode(HttpStatus.OK)
   @ApiBody({
     type: LoginDto,
-    description: 'DEPRECATED: User login credentials',
+    description: 'User login credentials',
   })
   @ApiResponse({
     status: 410,
     description: 'Login is now handled by Core Engine Authentication API',
   })
   async login(@Body() body: LoginDto): Promise<LoginResponseDto> {
+    if (body.type === 'salesweakness')
+      return this.authService.login(body.email, body.password);
+    else if (body.type === 'core')
+      throw new NotImplementedException();
+
     throw new HttpException(
-      'Authentication is now handled by the Core Engine API.',
-      HttpStatus.GONE,
+      'Unexpected Error',
+      HttpStatus.BAD_REQUEST
     );
   }
 }
