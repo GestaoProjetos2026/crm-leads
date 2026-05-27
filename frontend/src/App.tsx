@@ -6,7 +6,7 @@ import FunnelPage from './pages/FunnelPage';
 import { Lead, LeadService } from './services/LeadService';
 import { authApi } from './services/api';
 import { isAxiosError } from 'axios';
-import logo from './assets/logo.svg';
+import logo from './assets/logo2.svg';
 import { MdBarChart, MdPeople, MdWarning, MdSchedule, MdSettings, MdExitToApp, MdTrackChanges, MdArrowForward, MdAttachMoney } from 'react-icons/md';
 
 const LoginScreen = () => {
@@ -156,7 +156,6 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
           <div className="sidebar-logo">
             <img src={logo} alt="SalesWeakness Logo" style={{ width: '180px' }} />
           </div>
-          <span className="version-badge">Sprint 4</span>
         </div>
         <nav className="sidebar-nav">
           <ul style={{ listStyle: 'none' }}>
@@ -198,7 +197,7 @@ const DashboardOverview = () => (
           <span className="title-icon"><MdBarChart size={20} /></span>
           Visão Geral
         </h2>
-        <p className="page-subtitle">Dashboard do Diretor Comercial — Sprint 4: Motor de Gargalos</p>
+        <p className="page-subtitle">Dashboard do Diretor Comercial: Motor de Gargalos</p>
       </div>
       <div style={{ display: 'flex', gap: '1rem' }}>
         <button className="btn btn-secondary hover-lift">Exportar CSV</button>
@@ -261,7 +260,6 @@ const DashboardOverview = () => (
 );
 
 const SettingsPlaceholder = ({
-  theme, setTheme,
   accentColor, setAccentColor,
   fontSize, setFontSize,
   leadsViewMode, setLeadsViewMode
@@ -269,7 +267,7 @@ const SettingsPlaceholder = ({
   <MainLayout>
     <header style={{ marginBottom: 'var(--spacing-xl)' }}>
       <h2 className="page-title" style={{ marginBottom: 'var(--spacing-xs)' }}>
-        <span className="title-icon">⚙️</span>
+        <span className="title-icon"><MdSettings size={20} /></span>
         Configurações
       </h2>
       <p className="page-subtitle">Gerencie as preferências da empresa, aparência e integrações.</p>
@@ -285,18 +283,6 @@ const SettingsPlaceholder = ({
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--spacing-lg)' }}>
           <div>
-            <label style={{ display: 'block', color: 'var(--text-secondary)', marginBottom: 'var(--spacing-xs)', fontSize: '0.875rem' }}>Tema Padrão</label>
-            <select
-              value={theme}
-              onChange={(e) => setTheme(e.target.value)}
-              style={{ width: '100%', padding: 'var(--spacing-sm)', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-primary)', color: 'var(--text-primary)', outline: 'none' }}
-            >
-              <option value="dark">Modo Escuro (Dark)</option>
-              <option value="light">Modo Claro (Light)</option>
-            </select>
-          </div>
-
-          <div>
             <label style={{ display: 'block', color: 'var(--text-secondary)', marginBottom: 'var(--spacing-xs)', fontSize: '0.875rem' }}>Tamanho da Fonte</label>
             <select
               value={fontSize}
@@ -307,26 +293,6 @@ const SettingsPlaceholder = ({
               <option value="16px">Normal (Padrão)</option>
               <option value="18px">Grande (Acessibilidade)</option>
             </select>
-          </div>
-
-          <div>
-            <label style={{ display: 'block', color: 'var(--text-secondary)', marginBottom: 'var(--spacing-sm)', fontSize: '0.875rem' }}>Cor de Destaque</label>
-            <div style={{ display: 'flex', gap: '0.75rem' }}>
-              {['#3B82F6', '#10B981', '#8B5CF6', '#F43F5E', '#F59E0B'].map(color => (
-                <button
-                  key={color}
-                  onClick={() => setAccentColor(color)}
-                  style={{
-                    width: '32px', height: '32px', borderRadius: '50%', backgroundColor: color,
-                    border: accentColor === color ? '3px solid var(--text-primary)' : '2px solid transparent',
-                    cursor: 'pointer',
-                    boxShadow: accentColor === color ? '0 0 10px rgba(0,0,0,0.2)' : 'none',
-                    transition: 'all var(--transition-fast)'
-                  }}
-                  aria-label={`Color ${color}`}
-                />
-              ))}
-            </div>
           </div>
 
           <div>
@@ -585,8 +551,8 @@ const LeadsScreen = ({ viewMode }: { viewMode: string }) => {
 };
 
 function App() {
-  const [theme, setTheme] = useState('dark');
-  const [accentColor, setAccentColor] = useState('#3B82F6');
+  const theme = 'dark';
+  const [accentColor, setAccentColor] = useState('#0466c8');
   const [fontSize, setFontSize] = useState('16px');
   const [leadsViewMode, setLeadsViewMode] = useState('table');
 
@@ -609,8 +575,6 @@ function App() {
           path="/settings"
           element={
             <SettingsPlaceholder
-              theme={theme}
-              setTheme={setTheme}
               accentColor={accentColor}
               setAccentColor={setAccentColor}
               fontSize={fontSize}
