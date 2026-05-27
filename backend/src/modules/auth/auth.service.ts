@@ -5,6 +5,7 @@ import { promisify } from 'util';
 import { JwtPayload } from '../../common/interfaces/jwt-payload.interface';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
+import { InjectRepository } from '@nestjs/typeorm';
 
 const scrypt = promisify(_scrypt);
 
@@ -12,6 +13,7 @@ const scrypt = promisify(_scrypt);
 export class AuthService {
   constructor(
     private readonly jwtService: JwtService,
+    @InjectRepository(User)
     private readonly userRepository: Repository<User>
   ) {}
 
