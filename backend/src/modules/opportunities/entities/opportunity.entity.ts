@@ -51,7 +51,7 @@ export class Opportunity {
   @Column({ name: 'expected_close_date', type: 'date', nullable: true })
   expectedCloseDate!: Date | null;
 
-  @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
+  @CreateDateColumn({ name: 'created_at', type: 'text' })
   createdAt!: Date;
 
   /**
@@ -59,7 +59,7 @@ export class Opportunity {
    * Updated by TypeORM on every save — resets the 48h counter.
    * Changed from 'date' to 'timestamp' for hour-level precision.
    */
-  @UpdateDateColumn({ name: 'updated_at', type: 'timestamp' })
+  @UpdateDateColumn({ name: 'updated_at', type: 'text' })
   updatedAt!: Date;
 
   /* ── Relations ── */

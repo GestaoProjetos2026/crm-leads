@@ -45,7 +45,7 @@ export class AuditLog {
   description!: string | null;
 
   /** Immutable — set on creation, never updated */
-  @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
+  @CreateDateColumn({ name: 'created_at', type: 'text' })
   createdAt!: Date;
 
   /* ── Relations ── */

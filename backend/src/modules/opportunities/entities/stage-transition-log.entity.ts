@@ -36,7 +36,7 @@ export class StageTransitionLog {
   @Column({ name: 'to_stage_id', type: 'int' })
   toStageId!: number;
 
-  @CreateDateColumn({ name: 'transitioned_at', type: 'timestamp' })
+  @CreateDateColumn({ name: 'transitioned_at', type: 'text' })
   transitionedAt!: Date;
 
   /* ── Relations ── */
