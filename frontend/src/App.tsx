@@ -22,8 +22,8 @@ const LoginScreen = () => {
     setLoading(true);
 
     try {
-      const response = await authApi.login(email, password);
-      const token = response.data.data.accessToken;
+      const response = await authApi.login(email, password, 'salesweakness');
+      const token = response.data.accessToken;
       
       // Decodifica o JWT base64 para pegar os roles (Core Engine JWT usa 'roles' em vez de 'profile')
       const payloadBase64 = token.split('.')[1];

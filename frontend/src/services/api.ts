@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3031/v1';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3031';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -68,12 +68,12 @@ export const auditApi = {
 };
 
 export const authApi = {
-  login: (email: string, password: string) => {
+  login: (email: string, password: string, type: 'salesweakness' | 'core') => {
     // Redirecionando para o Proxy configurado no vite.config.ts
-    const coreEngineUrl = import.meta.env.VITE_CORE_API_URL || '/core-api/v1';
-    return axios.post<{ success: boolean; data: { accessToken: string; refreshToken: string; tokenType: string; expiresIn: number } }>(
-      `${coreEngineUrl}/auth/login`,
-      { email, password }
+    const coreEngineUrl = import.meta.env.VITE_LOGIN_ENDPOINT || '/v1/auth/login';
+    return api.post<{ accessToken: string; }>(
+      coreEngineUrl,
+      { email, password, type }
     );
   },
 };
