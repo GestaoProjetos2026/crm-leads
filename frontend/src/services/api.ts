@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3031/v1';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://api.crm-leads.40.82.176.176.nip.io';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -68,8 +68,14 @@ export const auditApi = {
 };
 
 export const authApi = {
-  login: (email: string, password: string) =>
-    api.post<{ access_token: string }>('/auth/login', { email, password }),
+  login: (email: string, password: string, type: 'salesweakness' | 'core') => {
+    // Redirecionando para o Proxy configurado no vite.config.ts
+    const coreEngineUrl = import.meta.env.VITE_LOGIN_ENDPOINT || '/v1/auth/login';
+    return api.post<{ access_token: string; }>(
+      coreEngineUrl,
+      { email, password, type }
+    );
+  },
 };
 
 export default api;

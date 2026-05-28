@@ -9,6 +9,7 @@ import { AppService } from './app.service';
 import appConfig from './config/app.config';
 import databaseConfig from './config/database.config';
 import redisConfig from './config/redis.config';
+import fiscalConfig from './config/fiscal.config';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { AuthModule } from './modules/auth/auth.module';
 import { TenantsModule } from './modules/tenants/tenants.module';
@@ -19,13 +20,14 @@ import { StagesModule } from './modules/stages/stages.module';
 import { CampaignsModule } from './modules/campaigns/campaigns.module';
 import { WorkerModule } from './modules/worker/worker.module';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm'; 
+import { FiscalModule } from './modules/fiscal/fiscal.module';
 
 @Module({
   imports: [
     // Load all config namespaces globally so every module can inject them
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [appConfig, databaseConfig, redisConfig],
+      load: [appConfig, databaseConfig, redisConfig, fiscalConfig],
     }),
 
     // Event system for lead.stagnated and future domain events
@@ -46,6 +48,9 @@ import { TypeOrmModuleOptions } from '@nestjs/typeorm';
     AuditModule,
     StagesModule,
     CampaignsModule,
+
+    // Lead → Fiscal conversion (Squad 2)
+    FiscalModule,
 
     // Background workers (StagnationWorker with @Cron)
     WorkerModule,

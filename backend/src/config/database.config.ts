@@ -5,20 +5,18 @@ export default registerAs(
   'database',
   (): TypeOrmModuleOptions => ({
     type: 'postgres',
-    host: 'localhost',
+    host: process.env.NODE_ENV === 'production' ? 'postgres-svc.infra-banco.svc.cluster.local' : 'localhost',
     port: parseInt('5432', 10),
-    database: 'sales_weakness',
-    username: 'salesweakness',
-    password: 'salesweakness',
+    database: 'infra_banco',
+    username: 'user_crm_leads',
+    password: 'SenhaCrm123!',
+    schema: 'crm_leads',
     // Entities are auto-loaded via TypeOrmModule.forFeature() in each module
     autoLoadEntities: true,
     // NEVER true in production — use migrations instead
     synchronize: process.env.DB_SYNCHRONIZE === 'true',
     // Production SSL
-    ssl:
-      process.env.NODE_ENV === 'production'
-        ? { rejectUnauthorized: false }
-        : false,
+    ssl: false,
     extra: {
       application_name: 'salesweakness-api',
       // Connection pool sizing

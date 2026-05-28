@@ -41,4 +41,6 @@ COPY . .
 
 EXPOSE 3031
 
+CMD ["npm", "run", "migration:run"]
+
 CMD ["npm", "run", "start:dev"]

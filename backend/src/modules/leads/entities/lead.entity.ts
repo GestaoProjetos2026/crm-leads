@@ -38,7 +38,7 @@ export class Lead {
   source!: string;
 
   /** Soft-delete flag — set to true after 180d without interaction (RF03) */
-  @Column({ name: 'is_inactive', type: 'bool', default: false })
+  @Column({ name: 'is_inactive', type: 'boolean', default: false })
   isInactive!: boolean;
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
