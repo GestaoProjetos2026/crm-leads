@@ -17,13 +17,13 @@ const AppDataSource = new DataSource({
   subscribers: ['src/**/*.subscriber.ts'], 
 });
 
-AppDataSource.initialize().then(async () => {}).catch(() => {})
+// AppDataSource.initialize().then(async () => {}).catch(() => {})
 
-const originalInitialize = AppDataSource.initialize.bind(AppDataSource);
-AppDataSource.initialize = async () => {
-  const ds = await originalInitialize();
-  await ds.query(`CREATE SCHEMA IF NOT EXISTS "crm_leads"`);
-  return ds;
-};
+// const originalInitialize = AppDataSource.initialize.bind(AppDataSource);
+// AppDataSource.initialize = async () => {
+//   const ds = await originalInitialize();
+//   await ds.query(`CREATE SCHEMA IF NOT EXISTS "crm_leads"`);
+//   return ds;
+// };
 
 export default AppDataSource;
