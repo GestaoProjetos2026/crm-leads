@@ -26,7 +26,7 @@ EXPOSE 3031
 ENTRYPOINT ["./docker-entrypoint.sh"]
 CMD ["npm", "run", "start:dev"]
 
-# --- Production Stage --- (deve ser o ÚLTIMO)
+# --- Production Stage ---
 FROM node:24-alpine AS production
 
 ARG NODE_ENV=production
@@ -38,8 +38,8 @@ COPY package*.json ./
 RUN npm ci --omit=dev --legacy-peer-deps && npm cache clean --force
 
 COPY --from=builder /usr/src/app/dist ./dist
-COPY docker-entrypoint.sh ./
-RUN chmod +x docker-entrypoint.sh
+
+RUN printf '#!/bin/sh\nset -e\npwd\necho "Teste v2.4.14"\necho "Rodando migrations..."\nnpm run migration:run\necho "Iniciando aplicação..."\nexec "$@"\n' > docker-entrypoint.sh && chmod +x docker-entrypoint.sh
 
 USER node
 
