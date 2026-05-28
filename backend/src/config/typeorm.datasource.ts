@@ -6,7 +6,7 @@ dotenv.config();
 
 const AppDataSource = new DataSource({
   type: 'postgres',
-  host: process.env.NODE_ENV === 'production' ? 'postgres-svc.infra-banco.svc.cluster.local' : 'localhost',
+  host: 'postgres-svc.infra-banco.svc.cluster.local',
   port: parseInt('5432', 10),
   database: 'infra_banco',
   username: 'user_crm_leads',
@@ -17,13 +17,13 @@ const AppDataSource = new DataSource({
   subscribers: ['src/**/*.subscriber.ts'], 
 });
 
-AppDataSource.initialize().then(async () => {}).catch(() => {})
+// AppDataSource.initialize().then(async () => {}).catch(() => {})
 
-const originalInitialize = AppDataSource.initialize.bind(AppDataSource);
-AppDataSource.initialize = async () => {
-  const ds = await originalInitialize();
-  await ds.query(`CREATE SCHEMA IF NOT EXISTS "crm_leads"`);
-  return ds;
-};
+// const originalInitialize = AppDataSource.initialize.bind(AppDataSource);
+// AppDataSource.initialize = async () => {
+//   const ds = await originalInitialize();
+//   await ds.query(`CREATE SCHEMA IF NOT EXISTS "crm_leads"`);
+//   return ds;
+// };
 
 export default AppDataSource;

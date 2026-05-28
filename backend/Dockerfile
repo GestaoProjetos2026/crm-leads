@@ -9,7 +9,7 @@ RUN npm ci --legacy-peer-deps
 COPY . .
 RUN npm run build
 
-# --- Production Stage ---
+# --- Production Stage --- (deve ser o ÚLTIMO)
 FROM node:24-alpine AS production
 
 ARG NODE_ENV=production
@@ -21,13 +21,15 @@ COPY package*.json ./
 RUN npm ci --omit=dev --legacy-peer-deps && npm cache clean --force
 
 COPY --from=builder /usr/src/app/dist ./dist
+COPY docker-entrypoint.sh ./
+RUN chmod +x docker-entrypoint.sh
 
-# Use non-root user
 USER node
 
 EXPOSE 3031
 
-CMD ["node", "dist/main"]
+ENTRYPOINT ["./docker-entrypoint.sh"]
+CMD ["npm", "run", "start:dev"]
 
 # --- Development Stage ---
 FROM node:24-alpine AS development
@@ -38,9 +40,10 @@ COPY package*.json ./
 RUN npm install --legacy-peer-deps
 
 COPY . .
+COPY docker-entrypoint.sh ./
+RUN chmod +x docker-entrypoint.sh
 
 EXPOSE 3031
 
-CMD ["npm", "run", "migration:run"]
-
+ENTRYPOINT ["./docker-entrypoint.sh"]
 CMD ["npm", "run", "start:dev"]
