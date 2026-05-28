@@ -16,7 +16,7 @@ import { JwtService } from '@nestjs/jwt/dist/jwt.service';
  * o contexto de usuário. Isso mantém o secret isolado no Core Engine.
  *
  * Variável necessária no .env:
- *   CORE_ENGINE_URL=http://api.core-engine.40.82.176.176.nip.io
+ *   CORE_ENGINE_URL=https://api.core-engine.40.82.176.176.nip.io
  */
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
@@ -31,7 +31,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     super();
     this.coreEngineUrl = this.configService.get<string>(
       'CORE_ENGINE_URL',
-      'http://api.core-engine.40.82.176.176.nip.io',
+      'https://api.core-engine.40.82.176.176.nip.io',
     );
   }
 

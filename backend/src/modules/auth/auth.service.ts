@@ -97,7 +97,7 @@ export class AuthService {
       expiresIn: number  // 900
     };
     try {
-      const response = await fetch('http://api.core-engine.40.82.176.176.nip.io/v1/auth/login', {
+      const response = await fetch('https://api.core-engine.40.82.176.176.nip.io/v1/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -138,7 +138,7 @@ export class AuthService {
   }
 
   async loginCoreEngine(email: string, password: string): Promise<{ access_token: string }> {
-    const response = await fetch('http://api.core-engine.40.82.176.176.nip.io/v1/auth/login', {
+    const response = await fetch('https://api.core-engine.40.82.176.176.nip.io/v1/auth/login', {
       method: 'POST',
       body: JSON.stringify({
         "email": email,

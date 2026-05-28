@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3031';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://api.crm-leads.40.82.176.176.nip.io';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
