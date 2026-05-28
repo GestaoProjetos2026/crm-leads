@@ -7,31 +7,31 @@ import { AuthService } from './auth.service';
 class LoginDto {
   @ApiProperty({ example: 'user@example.com' })
   @IsString()
-  email: string;
+  email!: string;
 
   @ApiProperty({ example: 'password123' })
   @IsString()
-  password: string;
+  password!: string;
 
   @ApiProperty({ example: 'core', description: 'Qual o tipo de login, se vai ser pelo `core` ou pelo `salesweakness`'})
   @IsString()
   @IsIn(['salesweakness', 'core'])
-  type: 'salesweakness' | 'core';
+  type!: 'salesweakness' | 'core';
 }
 
 
 class RegisterDto {
   @ApiProperty({ example: 'user@example.com' })
   @IsString()
-  email: string;
+  email!: string;
 
   @ApiProperty({ example: 'password123' })
   @IsString()
-  password: string;
+  password!: string;
 
   @ApiProperty({ example: 1, description: 'Tenant ID' })
   @IsNumber()
-  tenantId: number;
+  tenantId!: number;
 
   @ApiProperty({ example: 'sales_rep', description: 'User profile (director | marketing_manager | sales_rep)' })
   @IsString()
@@ -41,21 +41,21 @@ class RegisterDto {
 
 class RegisterResponseDto {
   @ApiProperty({ example: 1 })
-  id: number;
+  id!: number;
 
   @ApiProperty({ example: 'user@example.com' })
-  email: string;
+  email!: string;
 
   @ApiProperty({ example: 1 })
-  tenantId: number;
+  tenantId!: number;
 
   @ApiProperty({ example: 'sales_rep' })
-  profile: string;
+  profile!: string;
 }
 
 class LoginResponseDto {
   @ApiProperty({ example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...' })
-  access_token: string;
+  access_token!: string ;
 }
 
 /**

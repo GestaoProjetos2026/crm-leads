@@ -7,7 +7,7 @@ import { TenantsService } from './tenants.service';
 class CreateTenantDto {
   @ApiProperty({ example: 'Acme Corporation' })
   @IsString()
-  name: string;
+  name!: string;
 
   @ApiProperty({
     example: 'starter',
@@ -21,19 +21,19 @@ class CreateTenantDto {
 
 class TenantResponseDto {
   @ApiProperty({ example: 1 })
-  id: number;
+  id!: number;
 
   @ApiProperty({ example: 'Acme Corporation' })
-  name: string;
+  name!: string;
 
   @ApiProperty({ example: 'starter' })
-  plan: string;
+  plan!: string;
 
   @ApiProperty({ example: false })
-  isBlocked: boolean;
+  isBlocked!: boolean;
 
   @ApiProperty({ example: '2026-05-25' })
-  createdAt: Date;
+  createdAt!: Date;
 }
 
 @ApiTags('tenants')

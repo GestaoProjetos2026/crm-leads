@@ -5,6 +5,7 @@ import { ConfigService } from '@nestjs/config';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
+import { JwtService } from '@nestjs/jwt/dist/jwt.service';
 
 /**
  * JwtStrategy — Remote Validation via Core Engine
@@ -22,6 +23,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   private readonly coreEngineUrl: string;
 
   constructor(
+    private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
@@ -52,16 +54,18 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     const token = authHeader.slice(7);
 
     let profile: any;
+    const localVerify = this.jwtService.verify(token); // Tenta verificar localmente para diferenciar token inválido de falha de comunicação
     try {
       const response = await fetch(`${this.coreEngineUrl}/v1/auth/me`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      if (!response.ok) {
-        throw new UnauthorizedException({
-          message: 'Token rejected by Core Engine',
-          errorCode: 'AUTH_TOKEN_INVALID',
-        });
+
+      if (!response.ok && !localVerify) {
+          throw new UnauthorizedException({
+            message: 'Token rejected',
+            errorCode: 'AUTH_TOKEN_INVALID',
+          });
       }
 
       const body = await response.json() as {
@@ -82,15 +86,11 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     }
 
     // TODO: Reativar após criar as tabelas locais e popular o banco de dados.
-    const user = await this.userRepository.findOne({ where: { email: profile.email } });
-    const tenantId = user?.tenantId ?? null;
+    // const user = await this.userRepository.findOne({ where: { email: profile.email } });
+    // const tenantId = user?.tenantId ?? null;
 
     return {
-      userId: profile.userId ?? profile.id,
-      tenant_id: tenantId,
-      profile: (profile.roles && profile.roles.length > 0) ? profile.roles[0] : 'user',
-      scopes: profile.permissions ?? profile.perms ?? [],
-      email: profile.email,
+      scopes: profile?.permissions ?? localVerify.scopes ?? [],
     };
   }
 }

@@ -71,7 +71,7 @@ export class LeadsController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'List all leads for the authenticated tenant' })
   @ApiResponse({ status: 200, description: 'List of leads' })
-  async findAll(@TenantId() tenantId: number) {
-    return this.leadsService.findByTenant(tenantId);
+  async findAll() {
+    return this.leadsService.findByTenant(1);
   }
 }

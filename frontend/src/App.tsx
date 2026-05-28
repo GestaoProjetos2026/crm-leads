@@ -23,7 +23,9 @@ const LoginScreen = () => {
 
     try {
       const response = await authApi.login(email, password, 'salesweakness');
-      const token = response.data.accessToken;
+      const token = response.data.access_token;
+
+      console.log('Login bem-sucedido. Token recebido:', response.data.access_token);
       
       // Decodifica o JWT base64 para pegar os roles (Core Engine JWT usa 'roles' em vez de 'profile')
       const payloadBase64 = token.split('.')[1];
@@ -37,7 +39,7 @@ const LoginScreen = () => {
       }));
       
       navigate('/dashboard');
-    } catch (err) {
+    } catch (err: any) {
       setLoading(false);
       if (isAxiosError(err)) {
         if (!err.response) {
