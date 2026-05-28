@@ -26,6 +26,6 @@ export class Campaign {
   @Column({ type: 'varchar', length: 50, default: 'active' })
   status!: string;
 
-  @CreateDateColumn({ name: 'created_at', type: 'text' })
+  @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
   createdAt!: Date;
 }

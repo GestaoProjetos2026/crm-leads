@@ -38,14 +38,14 @@ export class Lead {
   source!: string;
 
   /** Soft-delete flag — set to true after 180d without interaction (RF03) */
-  @Column({ name: 'is_inactive', type: 'int', default: false })
+  @Column({ name: 'is_inactive', type: 'boolean', default: false })
   isInactive!: boolean;
 
-  @CreateDateColumn({ name: 'created_at', type: 'text' })
+  @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
   createdAt!: Date;
 
   /** Monitored by inactivity Worker for 180d threshold */
-  @UpdateDateColumn({ name: 'updated_at', type: 'text' })
+  @UpdateDateColumn({ name: 'updated_at', type: 'timestamp' })
   updatedAt!: Date;
 
   /* ── Relations ── */

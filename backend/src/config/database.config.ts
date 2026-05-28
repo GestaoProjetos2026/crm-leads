@@ -4,14 +4,25 @@ import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 export default registerAs(
   'database',
   (): TypeOrmModuleOptions => ({
-    type: 'sqlite',
-    database:
-      process.env.NODE_ENV === 'production'
-        ? '/data/infra_banco.sqlite'
-        : './database.sqlite',
+    type: 'postgres',
+    host: process.env.NODE_ENV === 'production' ? 'postgres-svc.infra-banco.svc.cluster.local' : 'localhost',
+    port: parseInt('5432', 10),
+    database: 'infra_banco',
+    username: 'user_crm_leads',
+    password: 'SenhaCrm123!',
+    schema: 'crm_leads',
     // Entities are auto-loaded via TypeOrmModule.forFeature() in each module
     autoLoadEntities: true,
     // NEVER true in production — use migrations instead
-    synchronize: process.env.NODE_ENV !== 'production',
+    synchronize: process.env.DB_SYNCHRONIZE === 'true',
+    // Production SSL
+    ssl: false,
+    extra: {
+      application_name: 'salesweakness-api',
+      // Connection pool sizing
+      max: 20,
+      idleTimeoutMillis: 30310,
+      connectionTimeoutMillis: 5000,
+    },
   }),
 );
