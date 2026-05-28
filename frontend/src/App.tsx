@@ -277,7 +277,6 @@ const DashboardOverview = () => (
 );
 
 const SettingsPlaceholder = ({
-  accentColor, setAccentColor,
   fontSize, setFontSize,
   leadsViewMode, setLeadsViewMode
 }: any) => (
