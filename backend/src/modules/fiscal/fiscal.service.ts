@@ -55,7 +55,7 @@ export class FiscalService {
   ) {
     this.baseUrl = this.configService.get<string>(
       'fiscal.baseUrl',
-      'http://api.fiscal-finance.40.82.176.176.nip.io',
+      'https://api.fiscal-finance.40.82.176.176.nip.io',
     );
     this.apiUser = this.configService.get<string>('fiscal.apiUser', 'admin');
     this.apiPassword = this.configService.get<string>(

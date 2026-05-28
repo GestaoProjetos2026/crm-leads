@@ -7,7 +7,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/core-api': {
-        target: 'http://api.core-engine.40.82.176.176.nip.io',
+        target: 'https://api.core-engine.40.82.176.176.nip.io',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/core-api/, ''),
       },
