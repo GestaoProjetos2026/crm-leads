@@ -62,9 +62,9 @@ const FunnelPage = () => {
                     {opp.status === 'WON' ? (
                       <span className="badge badge-success">Ganha</span>
                     ) : opp.status === 'LOST' ? (
-                      <span className="badge badge-danger" style={{ background: 'rgba(239,68,68,0.1)', color: '#ef4444' }}>Perdida</span>
+                      <span className="badge badge-danger">Perdida</span>
                     ) : (
-                      <span className="badge badge-primary" style={{ background: 'rgba(59,130,246,0.1)', color: '#3b82f6' }}>Aberta</span>
+                      <span className="badge badge-primary">Aberta</span>
                     )}
                   </td>
                   <td>
