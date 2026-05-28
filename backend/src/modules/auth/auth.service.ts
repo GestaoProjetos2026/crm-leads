@@ -39,7 +39,6 @@ export class AuthService {
   async validateUser(email: string, password: string): Promise<any> {
     const user = await this.userRepository.findOne({
       where: { email },
-      relations: ['tenant'],
     });
 
     if (!user?.passwordHash) {

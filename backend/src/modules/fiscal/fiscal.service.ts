@@ -84,7 +84,6 @@ export class FiscalService {
     // ── 1. Fetch the lead ──────────────────────────────────────────────
     const lead = await this.leadRepository.findOne({
       where: { id: leadId, tenantId },
-      relations: ['campaign'],
     });
 
     if (!lead) {
@@ -105,7 +104,6 @@ export class FiscalService {
     const opportunity = await this.opportunityRepository.findOne({
       where: opportunityWhere,
       order: { createdAt: 'DESC' },
-      relations: ['stage'],
     });
 
     if (!opportunity) {

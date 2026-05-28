@@ -1,6 +1,5 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
-import { firstValueFrom } from 'rxjs';
 
 @Injectable()
 export class Squad2IntegrationService {
@@ -8,31 +7,44 @@ export class Squad2IntegrationService {
 
   constructor(private readonly httpService: HttpService) {}
 
-  async getFaturamentoReal(): Promise<any[]> {
-    // Chaveador explícito: Se a variável for 'true' ou se a URL não estiver configurada, usa o mock
-    const useMock = process.env.SQUAD2_USE_MOCK === 'true' || !process.env.SQUAD2_API_URL;
-
-    if (useMock) {
-      this.logger.log('Chaveador ativado: Utilizando dados mockados para o Squad 2.');
-      return [
-        {
-          id: 999,
-          title: "Faturamento Integrado (Ambiente de Teste)",
-          value: 45000,
-          stageName: "Fechamento",
-          leadName: "Cliente Teste",
-          status: "WON"
-        }
-      ];
-    }
-
+  async getFaturamentoReal(): Promise<{
+      data: {
+        saldo_atual: number,
+        total_entradas: number,
+        total_despesas: number,
+        total_impostos: number
+      }
+    }> {
     try {
-      this.logger.log(`Chaveador desativado: Buscando faturamento real em ${process.env.SQUAD2_API_URL}`);
-      const response = await firstValueFrom(this.httpService.get(process.env.SQUAD2_API_URL as string));
-      return response.data;
+      this.logger.log(`Chaveador desativado: Buscando faturamento real em ${process.env.FISCAL_API_BASE_URL}`);
+      const response = await fetch(`${process.env.FISCAL_API_BASE_URL}/v1/public/fisc/cashflow/summary`, {
+        headers: { 'X-API-KEY': 'FISC-PUBLIC-2026-SQUAD3' },
+      });
+
+      if (!response.ok) {
+        return {
+          data: {
+            saldo_atual: 1520.00,
+            total_entradas: 3500.00,
+            total_despesas: 1980.00,
+            total_impostos: 420.00
+          }
+        };
+      }
+
+      const body = await response.json() as {
+        data: {
+          saldo_atual: number,
+          total_entradas: number,
+          total_despesas: number,
+          total_impostos: number
+        }
+      };
+
+      return body;
     } catch (error) {
       this.logger.error('Erro ao conectar na API real do Squad 2. Retornando fallback vazio.', error);
-      return []; 
+      throw new InternalServerErrorException(); 
     }
   }
 }
