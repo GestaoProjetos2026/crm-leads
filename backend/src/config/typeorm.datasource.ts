@@ -6,7 +6,7 @@ dotenv.config();
 
 const AppDataSource = new DataSource({
   type: 'postgres',
-  host: process.env.NODE_ENV === 'production' ? 'postgres-svc.infra-banco.svc.cluster.local' : 'localhost',
+  host: 'postgres-svc.infra-banco.svc.cluster.local',
   port: parseInt('5432', 10),
   database: 'infra_banco',
   username: 'user_crm_leads',

@@ -5,7 +5,7 @@ export default registerAs(
   'database',
   (): TypeOrmModuleOptions => ({
     type: 'postgres',
-    host: process.env.NODE_ENV === 'production' ? 'postgres-svc.infra-banco.svc.cluster.local' : 'localhost',
+    host: 'postgres-svc.infra-banco.svc.cluster.local',
     port: parseInt('5432', 10),
     database: 'infra_banco',
     username: 'user_crm_leads',
@@ -21,7 +21,7 @@ export default registerAs(
       application_name: 'salesweakness-api',
       // Connection pool sizing
       max: 20,
-      idleTimeoutMillis: 30310,
+      idleTimeoutMillis: 3000,
       connectionTimeoutMillis: 5000,
     },
   }),
