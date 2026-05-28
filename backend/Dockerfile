@@ -46,4 +46,4 @@ USER node
 EXPOSE 3031
 
 ENTRYPOINT ["./docker-entrypoint.sh"]
-CMD ["node", "dist/main"]
+CMD ["npm", "run", "start:dev"]
