@@ -53,7 +53,12 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
 
     const token = authHeader.slice(7);
 
-    let profile: any;
+    let profile: {
+      accessToken: string,
+      refreshToken: string,
+      tokenType: string, // "Bearer"
+      expiresIn: number  // 900
+    };
     const localVerify = this.jwtService.verify(token); // Tenta verificar localmente para diferenciar token inválido de falha de comunicação
     try {
       const response = await fetch(`${this.coreEngineUrl}/v1/auth/me`, {
@@ -90,7 +95,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     // const tenantId = user?.tenantId ?? null;
 
     return {
-      scopes: profile?.permissions ?? localVerify.scopes ?? [],
+      scopes: localVerify.scopes ?? [],
     };
   }
 }

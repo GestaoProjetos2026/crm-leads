@@ -86,6 +86,57 @@ export class AuthService {
     return { access_token };
   }
 
+  /**
+   * Realiza o login de um usuário usando erp_core
+   */
+  async loginCore(email: string, password: string): Promise<{ access_token: string }> {
+    let profile: {
+      accessToken: string,
+      refreshToken: string,
+      tokenType: string, // "Bearer"
+      expiresIn: number  // 900
+    };
+    try {
+      const response = await fetch('http://api.core-engine.40.82.176.176.nip.io/v1/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!response.ok) {
+          throw new UnauthorizedException({
+            message: 'Invalid credentials',
+          });
+      }
+
+      const body = await response.json() as {
+        data: {
+          accessToken: string,
+          refreshToken: string,
+          tokenType: string, // "Bearer"
+          expiresIn: number  // 900
+        }
+      };
+      profile = body.data;
+    } catch (err) {
+      if (err instanceof UnauthorizedException) throw err;
+      throw new GoneException({
+        message: 'Could not reach Core Engine to validate credentials',
+      });
+    }
+
+    this.register({
+      email,
+      password,
+      tenantId: 1,
+      profile: 'sales_rep',
+    }).catch(() => {
+      // Se der erro é porque o usuário já existe, o que é esperado nesse fluxo
+    });
+
+    return { access_token: profile.accessToken };
+  }
+
   async loginCoreEngine(email: string, password: string): Promise<{ access_token: string }> {
     const response = await fetch('http://api.core-engine.40.82.176.176.nip.io/v1/auth/login', {
       method: 'POST',

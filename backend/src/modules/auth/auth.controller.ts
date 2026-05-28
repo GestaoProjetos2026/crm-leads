@@ -118,7 +118,7 @@ export class AuthController {
     if (body.type === 'salesweakness')
       return this.authService.login(body.email, body.password);
     else if (body.type === 'core')
-      throw new NotImplementedException();
+      return this.authService.loginCore(body.email, body.password);
 
     throw new HttpException(
       'Unexpected Error',

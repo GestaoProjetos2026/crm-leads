@@ -16,16 +16,16 @@ const LoginScreen = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
+    const button = (e.nativeEvent as SubmitEvent).submitter as HTMLButtonElement;
+
     e.preventDefault();
     setError('');
     setLoading(true);
 
     try {
-      const response = await authApi.login(email, password, 'salesweakness');
+      const response = await authApi.login(email, password, button.name as 'core' | 'salesweakness');
       const token = response.data.access_token;
-
-      console.log('Login bem-sucedido. Token recebido:', response.data.access_token);
       
       // Decodifica o JWT base64 para pegar os roles (Core Engine JWT usa 'roles' em vez de 'profile')
       const payloadBase64 = token.split('.')[1];
@@ -121,6 +121,7 @@ const LoginScreen = () => {
           </div>
 
           <button
+            name="salesweakness"
             type="submit"
             className="btn btn-primary"
             disabled={loading}
@@ -131,6 +132,20 @@ const LoginScreen = () => {
           >
             {loading ? 'Entrando...' : 'Entrar'}
           </button>
+          <div className="divider" style={{ display: 'flex', alignItems: 'center', justifyContent: 'right' }}>
+            <button
+              name="core"
+              type="submit"
+              className="btn btn-primary"
+              disabled={loading}
+              style={{
+                width: 'fit-content', padding: '0.875rem', fontSize: '1rem',
+                opacity: loading ? 0.7 : 1, cursor: loading ? 'wait' : 'pointer',
+              }}
+            >
+              {loading ? 'Entrando...' : 'Cooregle'}
+            </button>
+          </div>
         </form>
 
 
