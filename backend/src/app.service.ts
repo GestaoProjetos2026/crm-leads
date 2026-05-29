@@ -6,7 +6,12 @@ export class AppService {
     return 'Hello World!';
   }
 
-  getHealth(): string {
-    return 'Alive';
+  getHealth() {
+    return {
+      status: 'ok',
+      services: {
+        database: 'ok',
+      },
+    };
   }
 }

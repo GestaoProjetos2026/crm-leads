@@ -16,7 +16,7 @@ export class AppController {
 
   @Get('health')
   @Public()
-  getHealth(): string {
+  getHealth() {
     return this.appService.getHealth();
   }
 }
