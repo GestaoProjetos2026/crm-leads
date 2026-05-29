@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authApi } from './services/api';
 import { isAxiosError } from 'axios';
@@ -13,6 +13,13 @@ export const LoginScreen = () => {
   const [error, setError] = useState('');
   const [loadingLoginLocal, setLoadingLoginLocal] = useState(false);
   const [loadingLoginCore, setLoadingLoginCore] = useState(false);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    // Pequeno delay para garantir que o browser pintou o estado inicial (opacity: 0)
+    const timer = setTimeout(() => setVisible(true), 10);
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     const button = (e.nativeEvent as SubmitEvent).submitter as HTMLButtonElement;
@@ -64,7 +71,19 @@ export const LoginScreen = () => {
 
   return (
     <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-primary)' }}>
-      <div className="glass-panel" style={{ padding: '3rem 2rem', width: '100%', maxWidth: '420px', borderRadius: '16px' }}>
+      <div
+        className="glass-panel"
+        style={{
+          padding: '3rem 2rem',
+          width: '100%',
+          maxWidth: '420px',
+          borderRadius: '16px',
+          // Animação de entrada
+          opacity: visible ? 1 : 0,
+          transform: visible ? 'translateY(0)' : 'translateY(16px)',
+          transition: 'opacity 0.5s ease, transform 0.5s ease',
+        }}
+      >
         <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
           <img src={logo} alt="SalesWeakness Logo" style={{ width: '250px' }} />
           <p style={{ color: 'var(--text-secondary)' }}>Faça login para acessar seu painel.</p>
