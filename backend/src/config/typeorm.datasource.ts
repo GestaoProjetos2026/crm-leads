@@ -22,7 +22,7 @@ const AppDataSource = new DataSource({
 // const originalInitialize = AppDataSource.initialize.bind(AppDataSource);
 // AppDataSource.initialize = async () => {
 //   const ds = await originalInitialize();
-//   await ds.query(`CREATE SCHEMA IF NOT EXISTS "crm_leads"`);
+//   await ds.query(``);
 //   return ds;
 // };
 

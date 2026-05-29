@@ -70,12 +70,45 @@ export const auditApi = {
 export const authApi = {
   login: (email: string, password: string, type: 'salesweakness' | 'core') => {
     // Redirecionando para o Proxy configurado no vite.config.ts
-    const coreEngineUrl = import.meta.env.VITE_LOGIN_ENDPOINT || '/v1/auth/login';
+    const url = import.meta.env.VITE_LOGIN_ENDPOINT || '/v1/auth/login';
     return api.post<{ access_token: string; }>(
-      coreEngineUrl,
+      url,
       { email, password, type }
     );
   },
+
+  register: (email: string, password: string) => {
+    // Redirecionando para o Proxy configurado no vite.config.ts
+    const url = import.meta.env.VITE_REGISTER_ENDPOINT || '/v1/auth/register';
+    return api.post<{id: number, email: string, tenantId: number, profile: string}>(
+      url,
+      { 
+        email,
+        password,
+        tenantId: 1,
+        profile: "sales_rep"
+      }
+    );
+  },
 };
+
+export const ficalApi = {
+  getActualBilling: () => {
+    const url = import.meta.env.VITE_FISCAL_ACTUAL_BILLING_ENDPOINT || '/v1/fiscal/actual-billing';
+    return api.get<{
+      saldo_atual: number,
+      total_entradas: number,
+      total_despesas: number,
+      total_impostos: number
+    }>(
+      url,
+      {
+        headers: {
+          'Authorization' : `Bearer ${localStorage.getItem('sw_token')}`
+        }
+      }
+    );
+  }
+}
 
 export default api;

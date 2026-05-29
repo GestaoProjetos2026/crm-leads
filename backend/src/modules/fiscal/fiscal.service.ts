@@ -4,6 +4,8 @@ import {
   NotFoundException,
   BadGatewayException,
   RequestTimeoutException,
+  BadRequestException,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
@@ -387,5 +389,30 @@ export class FiscalService {
       data: null,
       message: 'Erro inesperado ao comunicar com a API do Fiscal.',
     });
+  }
+
+  async getActualBilling(): Promise<{
+      saldo_atual: number,
+      total_entradas: number,
+      total_despesas: number,
+      total_impostos: number
+    }> {
+    this.logger.log(`Chaveador desativado: Buscando faturamento real em ${process.env.FISCAL_API_BASE_URL}`);
+    const response = await fetch(`${process.env.FISCAL_API_BASE_URL}/v1/public/fisc/cashflow/summary`, {
+      headers: { 'X-API-KEY': 'FISC-PUBLIC-2026-SQUAD3' },
+    });
+
+    if (!response.ok) {
+      throw new BadRequestException(`fiscal-finance response ${response.status}`)
+    }
+
+    const body = await response.json() as {
+      saldo_atual: number,
+      total_entradas: number,
+      total_despesas: number,
+      total_impostos: number
+    };
+
+    return body;
   }
 }

@@ -7,6 +7,7 @@ import {
   ParseIntPipe,
   HttpCode,
   HttpStatus,
+  BadRequestException,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -22,6 +23,7 @@ import { InvoiceIntentDto } from './dto/invoice-intent.dto';
 import { InvoiceConfirmDto } from './dto/invoice-confirm.dto';
 import { InvoiceProxyResponseDto } from './dto/invoice-response.dto';
 import { TenantId } from '../../common/decorators/tenant.decorator';
+import { ActualBillingResponseDto } from './dto/actual-billing-response.dto';
 
 /**
  * FiscalController — exposes the lead-to-Fiscal conversion endpoint
@@ -171,6 +173,26 @@ export class FiscalController {
     @Body() dto: InvoiceConfirmDto,
   ): Promise<InvoiceProxyResponseDto> {
     return this.fiscalService.invoiceConfirm(tenantId, dto);
+  }
+
+  @Get('actual-billing')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Puxa as estatisticas do fical',
+    description:
+      'Retorna resumo financeiro consolidado: saldo, entradas, despesas e impostos.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Retorno feito com sucesso',
+    type: ActualBillingResponseDto,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Api não retornou os resultados',
+  })
+  async getActualBilling(): Promise<ActualBillingResponseDto> {
+    return this.fiscalService.getActualBilling();
   }
 
   /**
