@@ -1,11 +1,53 @@
 import { Link } from 'react-router-dom';
 import { MdBarChart, MdWarning, MdSchedule, MdTrackChanges, MdArrowForward, MdAttachMoney } from 'react-icons/md';
 import { MainLayout } from './MainLayout';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { ficalApi } from './services/api';
+import { isAxiosError } from 'axios';
 
 
 export const DashboardOverview = () => {
-  useEffect(() => {}, [])
+  const [error, setError] = useState<string>()
+  const [loadingActualBilling, setLoadingActualBilling] = useState<boolean>()
+  const [actualBillingData, setActualBillingData] = useState<{
+      saldo_atual: number,
+      total_entradas: number,
+      total_despesas: number,
+      total_impostos: number
+    }>()
+
+  useEffect(() => {
+    handleLoadActualBilling()
+  }, [])
+
+  const handleLoadActualBilling = async () => {
+    setLoadingActualBilling(true)
+    setError('');
+
+    try {
+      const response = await ficalApi.getActualBilling();
+
+      if (response.data) {
+        setActualBillingData(response.data)
+      }
+    } catch (err: any) {
+      if (isAxiosError(err)) {
+        if (!err.response) {
+          setError('Erro de conexão: Não foi possível alcançar o servidor.');
+        } else if (err.response.status === 401) {
+          setError('E-mail ou senha incorretos.');
+        } else if (err.response.status === 403) {
+          setError('Sua conta ou tenant está bloqueada.');
+        } else {
+          setError(`Erro ao fazer login: ${err.response.data?.message || err.message}`);
+        }
+      } else {
+        setError('Ocorreu um erro inesperado.');
+      }
+    } finally {
+      setLoadingActualBilling(false);
+    }
+  };
 
   return (
   <MainLayout>
@@ -29,7 +71,11 @@ export const DashboardOverview = () => {
         <div className="kpi-icon"><MdAttachMoney size={24} /></div>
         <div className="kpi-content">
           <span className="kpi-label">Saldo Atual</span>
-          <span className="kpi-value">R$ 210.000</span>
+          <span className="kpi-value">{
+            error 
+              ? 'API Error' 
+              : `R$ ${loadingActualBilling ? 'Loading...' : actualBillingData?.saldo_atual.toFixed(2)}`
+          }</span>
         </div>
         <div className="kpi-pulse"></div>
       </div>
@@ -38,7 +84,11 @@ export const DashboardOverview = () => {
         <div className="kpi-icon"><MdAttachMoney size={24} /></div>
         <div className="kpi-content">
           <span className="kpi-label">Total entrada</span>
-          <span className="kpi-value">R$ 210.000</span>
+          <span className="kpi-value">{
+            error 
+              ? 'API Error' 
+              : `R$ ${loadingActualBilling ? 'Loading...' : actualBillingData?.total_entradas.toFixed(2)}`
+          }</span>
         </div>
         <div className="kpi-pulse"></div>
       </div>
@@ -47,7 +97,11 @@ export const DashboardOverview = () => {
         <div className="kpi-icon"><MdAttachMoney size={24} /></div>
         <div className="kpi-content">
           <span className="kpi-label">Total despesas</span>
-          <span className="kpi-value">R$ 210.000</span>
+          <span className="kpi-value">{
+            error 
+              ? 'API Error' 
+              : `R$ ${loadingActualBilling ? 'Loading...' : actualBillingData?.total_despesas.toFixed(2)}`
+          }</span>
         </div>
       </div>
 
@@ -55,13 +109,19 @@ export const DashboardOverview = () => {
         <div className="kpi-icon"><MdAttachMoney size={24} /></div>
         <div className="kpi-content">
           <span className="kpi-label">Total imposto</span>
-          <span className="kpi-value">R$ 210.000</span>
+          <span className="kpi-value">{
+            error 
+              ? 'API Error' 
+              : `R$ ${loadingActualBilling ? 'Loading...' : actualBillingData?.total_impostos.toFixed(2)}`
+          }</span>
         </div>
         <div className="kpi-pulse"></div>
       </div>
+
     </div>
 
     <div className="kpi-grid">
+
       <div className="kpi-card kpi-info">
         <div className="kpi-icon"><MdTrackChanges size={24} /></div>
         <div className="kpi-content">
@@ -77,6 +137,7 @@ export const DashboardOverview = () => {
           <span className="kpi-value">4</span>
         </div>
       </div>
+
     </div>
 
     {/* Quick Links */}

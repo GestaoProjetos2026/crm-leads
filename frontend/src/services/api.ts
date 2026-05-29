@@ -92,4 +92,23 @@ export const authApi = {
   },
 };
 
+export const ficalApi = {
+  getActualBilling: () => {
+    const url = import.meta.env.VITE_FISCAL_ACTUAL_BILLING_ENDPOINT || '/v1/fiscal/actual-billing';
+    return api.get<{
+      saldo_atual: number,
+      total_entradas: number,
+      total_despesas: number,
+      total_impostos: number
+    }>(
+      url,
+      {
+        headers: {
+          'Authorization' : `Bearer ${localStorage.getItem('sw_token')}`
+        }
+      }
+    );
+  }
+}
+
 export default api;
