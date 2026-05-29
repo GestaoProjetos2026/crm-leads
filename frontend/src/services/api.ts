@@ -79,8 +79,8 @@ export const authApi = {
 
   register: (email: string, password: string) => {
     // Redirecionando para o Proxy configurado no vite.config.ts
-    const url = import.meta.env.VITE_LOGIN_ENDPOINT || '/v1/auth/register';
-    return api.post<{ access_token: string; }>(
+    const url = import.meta.env.VITE_REGISTER_ENDPOINT || '/v1/auth/register';
+    return api.post<{id: number, email: string, tenantId: number, profile: string}>(
       url,
       { 
         email,

@@ -38,8 +38,10 @@ export const RegisterScreen = () => {
     setLoading(true);
 
     try {
-      const response = await authApi.register(email, password);
-      const token = response.data.access_token;
+      await authApi.register(email, password);
+      
+      const responselogin = await authApi.login(email, password, 'salesweakness');
+      const token = responselogin.data.access_token;
 
       const payloadBase64 = token.split('.')[1];
       const payload = JSON.parse(atob(payloadBase64));
