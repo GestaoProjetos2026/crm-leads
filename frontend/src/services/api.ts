@@ -96,10 +96,12 @@ export const ficalApi = {
   getActualBilling: () => {
     const url = import.meta.env.VITE_FISCAL_ACTUAL_BILLING_ENDPOINT || '/v1/fiscal/actual-billing';
     return api.get<{
-      saldo_atual: number,
-      total_entradas: number,
-      total_despesas: number,
-      total_impostos: number
+      data :{
+        saldo_atual: number,
+        total_entradas: number,
+        total_despesas: number,
+        total_impostos: number
+      }
     }>(
       url,
       {

@@ -57,7 +57,7 @@ export const DashboardOverview = () => {
       const response = await ficalApi.getActualBilling();
 
       if (response.data) {
-        setActualBillingData(response.data)
+        setActualBillingData(response.data.data)
       }
     } catch (err: any) {
       if (isAxiosError(err)) {
@@ -103,7 +103,7 @@ export const DashboardOverview = () => {
           <span className="kpi-value">{
             errorActualBilling 
               ? 'API Error' 
-              : `R$ ${loadingActualBilling ? 'Loading...' : actualBillingData?.saldo_atual.toFixed(2)}`
+              : `R$ ${loadingActualBilling ? 'Loading...' : actualBillingData?.saldo_atual?.toFixed(2)}`
           }</span>
         </div>
         <div className="kpi-pulse"></div>
@@ -116,7 +116,7 @@ export const DashboardOverview = () => {
           <span className="kpi-value">{
             errorActualBilling 
               ? 'API Error' 
-              : `R$ ${loadingActualBilling ? 'Loading...' : actualBillingData?.total_entradas.toFixed(2)}`
+              : `R$ ${loadingActualBilling ? 'Loading...' : actualBillingData?.total_entradas?.toFixed(2)}`
           }</span>
         </div>
         <div className="kpi-pulse"></div>
@@ -129,7 +129,7 @@ export const DashboardOverview = () => {
           <span className="kpi-value">{
             errorActualBilling 
               ? 'API Error' 
-              : `R$ ${loadingActualBilling ? 'Loading...' : actualBillingData?.total_despesas.toFixed(2)}`
+              : `R$ ${loadingActualBilling ? 'Loading...' : actualBillingData?.total_despesas?.toFixed(2)}`
           }</span>
         </div>
       </div>
@@ -141,7 +141,7 @@ export const DashboardOverview = () => {
           <span className="kpi-value">{
             errorActualBilling 
               ? 'API Error' 
-              : `R$ ${loadingActualBilling ? 'Loading...' : actualBillingData?.total_impostos.toFixed(2)}`
+              : `R$ ${loadingActualBilling ? 'Loading...' : actualBillingData?.total_impostos?.toFixed(2)}`
           }</span>
         </div>
         <div className="kpi-pulse"></div>
