@@ -57,18 +57,18 @@ export class StagnationWorker {
         sla_max_hours: number;
       }> = await this.opportunityRepo.query(`
         SELECT
-          o.id AS opportunity_id,
-          o.tenant_id,
-          o.lead_id,
-          o.stage_id,
-          s.name AS stage_name,
-          o.value,
-          EXTRACT(EPOCH FROM (NOW() - o.updated_at)) / 3600 AS hours_stagnant,
-          s.sla_max_hours
-        FROM opportunities o
-        JOIN stages s ON o.stage_id = s.id AND o.tenant_id = s.tenant_id
+            o.id AS opportunity_id,
+            o.tenant_id,
+            o.lead_id,
+            o.stage_id,
+            s.name AS stage_name,
+            o.value,
+            EXTRACT(EPOCH FROM (NOW() - o.updated_at)) / 3600 AS hours_stagnant,
+            s.sla_max_hours
+        FROM "crm_leads"."opportunities" o
+        JOIN "crm_leads"."stages" s ON o.stage_id = s.id AND o.tenant_id = s.tenant_id
         WHERE o.status = 'Open'
-          AND EXTRACT(EPOCH FROM (NOW() - o.updated_at)) / 3600 > s.sla_max_hours
+            AND EXTRACT(EPOCH FROM (NOW() - o.updated_at)) / 3600 > s.sla_max_hours
         ORDER BY hours_stagnant DESC
       `);
 
