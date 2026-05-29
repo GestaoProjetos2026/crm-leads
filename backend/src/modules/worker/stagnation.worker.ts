@@ -63,12 +63,12 @@ export class StagnationWorker {
           o.stage_id,
           s.name AS stage_name,
           o.value,
-          (julianday('now') - julianday(o.updated_at)) * 24 AS hours_stagnant,
+          EXTRACT(EPOCH FROM (NOW() - o.updated_at)) / 3600 AS hours_stagnant,
           s.sla_max_hours
         FROM opportunities o
         JOIN stages s ON o.stage_id = s.id AND o.tenant_id = s.tenant_id
         WHERE o.status = 'Open'
-          AND (julianday('now') - julianday(o.updated_at)) * 24 > s.sla_max_hours
+          AND EXTRACT(EPOCH FROM (NOW() - o.updated_at)) / 3600 > s.sla_max_hours
         ORDER BY hours_stagnant DESC
       `);
 
