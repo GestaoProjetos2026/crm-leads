@@ -22,10 +22,11 @@ export const LoginScreen = () => {
   }, []);
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    
     const button = (e.nativeEvent as SubmitEvent).submitter as HTMLButtonElement;
     const buttonName = button.name as 'core' | 'salesweakness'
 
-    e.preventDefault();
     setError('');
 
     if (buttonName === 'salesweakness')

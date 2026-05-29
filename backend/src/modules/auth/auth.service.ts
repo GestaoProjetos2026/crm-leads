@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException, ForbiddenException, GoneException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, ForbiddenException, GoneException, BadRequestException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { randomBytes, scrypt as _scrypt, timingSafeEqual } from 'crypto';
 import { promisify } from 'util';
@@ -190,7 +190,7 @@ export class AuthService {
     // Verifica se já existe usuário com o mesmo email
     const existing = await this.userRepository.findOne({ where: { email } });
     if (existing) {
-      throw new Error('Usuário já existe com este email');
+      throw new BadRequestException('Usuário já existe com este email');
     }
     const passwordHash = await this.hashPassword(password);
     const user = this.userRepository.create({
