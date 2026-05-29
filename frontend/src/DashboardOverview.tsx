@@ -4,10 +4,14 @@ import { MainLayout } from './MainLayout';
 import { useEffect, useState } from 'react';
 import { ficalApi } from './services/api';
 import { isAxiosError } from 'axios';
+import { Lead, LeadService } from './services/LeadService';
 
 
 export const DashboardOverview = () => {
-  const [error, setError] = useState<string>()
+  const [errorLeads, setErrorLeads] = useState<string>()
+  const [leads, setLeads] = useState<Lead[]>([]);
+  const [loadingLeads, setLoadingLeads] = useState<boolean>()
+  const [errorActualBilling, setErrorActualBilling] = useState<string>()
   const [loadingActualBilling, setLoadingActualBilling] = useState<boolean>()
   const [actualBillingData, setActualBillingData] = useState<{
       saldo_atual: number,
@@ -17,12 +21,37 @@ export const DashboardOverview = () => {
     }>()
 
   useEffect(() => {
-    handleLoadActualBilling()
+    fetchLeads();
+    fetchLoadActualBilling()
   }, [])
 
-  const handleLoadActualBilling = async () => {
+  const fetchLeads = async () => {
+    setLoadingLeads(true);
+    try {
+      const data = await LeadService.getLeads();
+      setLeads(data);
+    } catch (err: any) {
+      if (isAxiosError(err)) {
+        if (!err.response) {
+          setErrorLeads('Erro de conexão: Não foi possível alcançar o servidor.');
+        } else if (err.response.status === 401) {
+          setErrorLeads('E-mail ou senha incorretos.');
+        } else if (err.response.status === 403) {
+          setErrorLeads('Sua conta ou tenant está bloqueada.');
+        } else {
+          setErrorLeads(`Erro ao fazer login: ${err.response.data?.message || err.message}`);
+        }
+      } else {
+        setErrorLeads('Ocorreu um erro inesperado.');
+      }
+    } finally {
+      setLoadingLeads(false);
+    }
+  };
+
+  const fetchLoadActualBilling = async () => {
     setLoadingActualBilling(true)
-    setError('');
+    setErrorActualBilling('');
 
     try {
       const response = await ficalApi.getActualBilling();
@@ -33,16 +62,16 @@ export const DashboardOverview = () => {
     } catch (err: any) {
       if (isAxiosError(err)) {
         if (!err.response) {
-          setError('Erro de conexão: Não foi possível alcançar o servidor.');
+          setErrorActualBilling('Erro de conexão: Não foi possível alcançar o servidor.');
         } else if (err.response.status === 401) {
-          setError('E-mail ou senha incorretos.');
+          setErrorActualBilling('E-mail ou senha incorretos.');
         } else if (err.response.status === 403) {
-          setError('Sua conta ou tenant está bloqueada.');
+          setErrorActualBilling('Sua conta ou tenant está bloqueada.');
         } else {
-          setError(`Erro ao fazer login: ${err.response.data?.message || err.message}`);
+          setErrorActualBilling(`Erro ao fazer login: ${err.response.data?.message || err.message}`);
         }
       } else {
-        setError('Ocorreu um erro inesperado.');
+        setErrorActualBilling('Ocorreu um erro inesperado.');
       }
     } finally {
       setLoadingActualBilling(false);
@@ -72,7 +101,7 @@ export const DashboardOverview = () => {
         <div className="kpi-content">
           <span className="kpi-label">Saldo Atual</span>
           <span className="kpi-value">{
-            error 
+            errorActualBilling 
               ? 'API Error' 
               : `R$ ${loadingActualBilling ? 'Loading...' : actualBillingData?.saldo_atual.toFixed(2)}`
           }</span>
@@ -85,7 +114,7 @@ export const DashboardOverview = () => {
         <div className="kpi-content">
           <span className="kpi-label">Total entrada</span>
           <span className="kpi-value">{
-            error 
+            errorActualBilling 
               ? 'API Error' 
               : `R$ ${loadingActualBilling ? 'Loading...' : actualBillingData?.total_entradas.toFixed(2)}`
           }</span>
@@ -98,7 +127,7 @@ export const DashboardOverview = () => {
         <div className="kpi-content">
           <span className="kpi-label">Total despesas</span>
           <span className="kpi-value">{
-            error 
+            errorActualBilling 
               ? 'API Error' 
               : `R$ ${loadingActualBilling ? 'Loading...' : actualBillingData?.total_despesas.toFixed(2)}`
           }</span>
@@ -110,7 +139,7 @@ export const DashboardOverview = () => {
         <div className="kpi-content">
           <span className="kpi-label">Total imposto</span>
           <span className="kpi-value">{
-            error 
+            errorActualBilling 
               ? 'API Error' 
               : `R$ ${loadingActualBilling ? 'Loading...' : actualBillingData?.total_impostos.toFixed(2)}`
           }</span>
@@ -126,7 +155,11 @@ export const DashboardOverview = () => {
         <div className="kpi-icon"><MdTrackChanges size={24} /></div>
         <div className="kpi-content">
           <span className="kpi-label">Leads Ativos</span>
-          <span className="kpi-value">5</span>
+          <span className="kpi-value">{
+            errorLeads 
+              ? 'API Error' 
+              : loadingLeads ? 'Loading...' : leads.filter(lead => lead.isInactive).length
+            }</span>
         </div>
       </div>
       
@@ -134,7 +167,11 @@ export const DashboardOverview = () => {
         <div className="kpi-icon"><MdWarning size={24} /></div>
         <div className="kpi-content">
           <span className="kpi-label">Gargalos Ativos</span>
-          <span className="kpi-value">4</span>
+          <span className="kpi-value">{
+            errorLeads 
+              ? 'API Error' 
+              : loadingLeads ? 'Loading...' : leads.filter(lead => !lead.isInactive).length
+            }</span>
         </div>
       </div>
 
