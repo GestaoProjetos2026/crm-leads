@@ -39,7 +39,7 @@ export const RegisterScreen = () => {
 
     try {
       await authApi.register(email, password);
-      
+
       const responselogin = await authApi.login(email, password, 'salesweakness');
       const token = responselogin.data.access_token;
 
@@ -105,19 +105,19 @@ export const RegisterScreen = () => {
 
   return (
     <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-primary)' }}>
-        <div
-          className="glass-panel"
-          style={{
-            padding: '3rem 2rem',
-            width: '100%',
-            maxWidth: '420px',
-            borderRadius: '16px',
-            // Animação de entrada
-            opacity: visible ? 1 : 0,
-            transform: visible ? 'translateY(0)' : 'translateY(16px)',
-            transition: 'opacity 0.5s ease, transform 0.5s ease',
-          }}
-        >
+      <div
+        className="glass-panel"
+        style={{
+          padding: '3rem 2rem',
+          width: '100%',
+          maxWidth: '420px',
+          borderRadius: '16px',
+          // Animação de entrada
+          opacity: visible ? 1 : 0,
+          transform: visible ? 'translateY(0)' : 'translateY(16px)',
+          transition: 'opacity 0.5s ease, transform 0.5s ease',
+        }}
+      >
 
         <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
           <img src={logo} alt="SalesWeakness Logo" style={{ width: '250px' }} />
