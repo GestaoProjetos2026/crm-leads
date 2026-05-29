@@ -8,10 +8,16 @@ export class AppService {
 
   getHealth() {
     return {
-      status: 'ok',
-      services: {
-        database: 'ok',
+      success: true,
+      data: {
+        status: "ok",
+        services: {
+          database: "ok",
+          redis: "ok"
+        }
       },
+      timestamp: Date.now().toString(),
+      path: "/v1/health"
     };
   }
 }
