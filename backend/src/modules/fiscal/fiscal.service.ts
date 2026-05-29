@@ -398,7 +398,7 @@ export class FiscalService {
       total_impostos: number
     }> {
     this.logger.log(`Chaveador desativado: Buscando faturamento real em ${process.env.FISCAL_API_BASE_URL}`);
-    const response = await fetch(`${process.env.FISCAL_API_BASE_URL}/v1/public/fisc/cashflow/summary`, {
+    const response = await fetch('https://api.fiscal-finance.40.82.176.176.nip.io/v1/public/fisc/cashflow/summary', {
       headers: { 'X-API-KEY': 'FISC-PUBLIC-2026-SQUAD3' },
     });
 
