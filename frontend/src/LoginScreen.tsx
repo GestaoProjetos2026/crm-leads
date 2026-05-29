@@ -152,14 +152,6 @@ export const LoginScreen = () => {
             </button>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-secondary)', fontSize: '0.875rem', cursor: 'pointer' }}>
-              <input type="checkbox" style={{ accentColor: 'var(--accent-primary)' }} />
-              Lembrar de mim
-            </label>
-            <a href="#" style={{ color: 'var(--accent-primary)', fontSize: '0.875rem', textDecoration: 'none' }}>Esqueceu a senha?</a>
-          </div>
-
           <button
             name="salesweakness"
             type="submit"
@@ -172,6 +164,11 @@ export const LoginScreen = () => {
           >
             {loadingLoginLocal ? 'Entrando...' : 'Entrar'}
           </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', margin: '0.5rem 0' }}>
+            <div style={{ flex: 1, height: '1px', background: 'var(--border-color)' }} />
+            <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>ou</span>
+            <div style={{ flex: 1, height: '1px', background: 'var(--border-color)' }} />
+          </div>
           <div className="divider" style={{ display: 'flex', alignItems: 'center', justifyContent: 'right' }}>
             <button
               name="core"
@@ -179,15 +176,17 @@ export const LoginScreen = () => {
               className="btn btn-primary"
               disabled={loadingLoginLocal}
               style={{
-                width: 'fit-content', padding: '0.875rem', fontSize: '1rem',
+                width: '100%', padding: '0.875rem', fontSize: '1rem',
                 opacity: loadingLoginLocal ? 0.7 : 1, cursor: loadingLoginLocal ? 'wait' : 'pointer',
               }}
             >
               {loadingLoginCore ? 'Entrando...' : 'Cooregle'}
             </button>
           </div>
+          <p style={{ textAlign: 'center', fontSize: '0.875rem', color: 'var(--text-secondary)', marginTop: '1rem' }}>
+            Não tem uma conta? <a href="#" style={{ color: 'var(--accent-primary)' }}>Registrar-se</a>
+          </p>
         </form>
-
 
       </div>
     </div>
