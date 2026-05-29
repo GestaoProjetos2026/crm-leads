@@ -184,10 +184,9 @@ export const LoginScreen = () => {
             </button>
           </div>
           <p style={{ textAlign: 'center', fontSize: '0.875rem', color: 'var(--text-secondary)', marginTop: '1rem' }}>
-            Não tem uma conta? <a href="#" style={{ color: 'var(--accent-primary)' }}>Registrar-se</a>
+            Não tem uma conta? <a href="/register" style={{ color: 'var(--accent-primary)' }}>Registrar-se</a>
           </p>
         </form>
-
       </div>
     </div>
   );

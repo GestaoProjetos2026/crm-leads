@@ -70,10 +70,24 @@ export const auditApi = {
 export const authApi = {
   login: (email: string, password: string, type: 'salesweakness' | 'core') => {
     // Redirecionando para o Proxy configurado no vite.config.ts
-    const coreEngineUrl = import.meta.env.VITE_LOGIN_ENDPOINT || '/v1/auth/login';
+    const url = import.meta.env.VITE_LOGIN_ENDPOINT || '/v1/auth/login';
     return api.post<{ access_token: string; }>(
-      coreEngineUrl,
+      url,
       { email, password, type }
+    );
+  },
+
+  register: (email: string, password: string) => {
+    // Redirecionando para o Proxy configurado no vite.config.ts
+    const url = import.meta.env.VITE_LOGIN_ENDPOINT || '/v1/auth/register';
+    return api.post<{ access_token: string; }>(
+      url,
+      { 
+        email,
+        password,
+        tenantId: 1,
+        profile: "sales_rep"
+      }
     );
   },
 };

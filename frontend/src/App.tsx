@@ -9,6 +9,7 @@ import { DashboardOverview } from './DashboardOverview';
 import { LeadsScreen } from './LeadsScreen';
 import { MainLayout } from './MainLayout';
 import { SettingsPlaceholder } from './SettingsPlaceholder';
+import { RegisterScreen } from './RegisterScreen';
 
 function App() {
   const theme = 'dark';
@@ -26,6 +27,7 @@ function App() {
     <>
       <Routes>
         <Route path="/login" element={<LoginScreen />} />
+        <Route path="/register" element={<RegisterScreen />} />
         <Route path="/dashboard" element={<DashboardOverview />} />
         <Route path="/leads" element={<LeadsScreen viewMode={leadsViewMode} />} />
         <Route path="/funnel" element={<MainLayout><FunnelPage /></MainLayout>} />
