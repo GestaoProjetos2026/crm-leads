@@ -1,9 +1,13 @@
 import { Link } from 'react-router-dom';
 import { MdBarChart, MdWarning, MdSchedule, MdTrackChanges, MdArrowForward, MdAttachMoney } from 'react-icons/md';
 import { MainLayout } from './MainLayout';
+import { useEffect } from 'react';
 
 
-export const DashboardOverview = () => (
+export const DashboardOverview = () => {
+  useEffect(() => {}, [])
+
+  return (
   <MainLayout>
     <header className="page-header">
       <div>
@@ -20,6 +24,44 @@ export const DashboardOverview = () => (
     </header>
 
     <div className="kpi-grid">
+
+      <div className="kpi-card kpi-info">
+        <div className="kpi-icon"><MdAttachMoney size={24} /></div>
+        <div className="kpi-content">
+          <span className="kpi-label">Saldo Atual</span>
+          <span className="kpi-value">R$ 210.000</span>
+        </div>
+        <div className="kpi-pulse"></div>
+      </div>
+
+      <div className="kpi-card kpi-info">
+        <div className="kpi-icon"><MdAttachMoney size={24} /></div>
+        <div className="kpi-content">
+          <span className="kpi-label">Total entrada</span>
+          <span className="kpi-value">R$ 210.000</span>
+        </div>
+        <div className="kpi-pulse"></div>
+      </div>
+
+      <div className="kpi-card kpi-danger">
+        <div className="kpi-icon"><MdAttachMoney size={24} /></div>
+        <div className="kpi-content">
+          <span className="kpi-label">Total despesas</span>
+          <span className="kpi-value">R$ 210.000</span>
+        </div>
+      </div>
+
+      <div className="kpi-card kpi-danger">
+        <div className="kpi-icon"><MdAttachMoney size={24} /></div>
+        <div className="kpi-content">
+          <span className="kpi-label">Total imposto</span>
+          <span className="kpi-value">R$ 210.000</span>
+        </div>
+        <div className="kpi-pulse"></div>
+      </div>
+    </div>
+
+    <div className="kpi-grid">
       <div className="kpi-card kpi-info">
         <div className="kpi-icon"><MdTrackChanges size={24} /></div>
         <div className="kpi-content">
@@ -27,16 +69,7 @@ export const DashboardOverview = () => (
           <span className="kpi-value">5</span>
         </div>
       </div>
-
-      <div className="kpi-card kpi-danger">
-        <div className="kpi-icon"><MdAttachMoney size={24} /></div>
-        <div className="kpi-content">
-          <span className="kpi-label">Valor em Risco</span>
-          <span className="kpi-value">R$ 210.000</span>
-        </div>
-        <div className="kpi-pulse"></div>
-      </div>
-
+      
       <div className="kpi-card kpi-warning">
         <div className="kpi-icon"><MdWarning size={24} /></div>
         <div className="kpi-content">
@@ -71,4 +104,4 @@ export const DashboardOverview = () => (
       </Link>
     </div>
   </MainLayout>
-);
+)};

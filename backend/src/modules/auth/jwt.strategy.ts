@@ -2,9 +2,6 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-custom';
 import { ConfigService } from '@nestjs/config';
-import { Repository } from 'typeorm';
-import { User } from './entities/user.entity';
-import { InjectRepository } from '@nestjs/typeorm';
 import { JwtService } from '@nestjs/jwt/dist/jwt.service';
 
 /**
@@ -25,8 +22,6 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   constructor(
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
   ) {
     super();
     this.coreEngineUrl = this.configService.get<string>(
@@ -53,12 +48,6 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
 
     const token = authHeader.slice(7);
 
-    let profile: {
-      accessToken: string,
-      refreshToken: string,
-      tokenType: string, // "Bearer"
-      expiresIn: number  // 900
-    };
     const localVerify = this.jwtService.verify(token); // Tenta verificar localmente para diferenciar token inválido de falha de comunicação
     try {
       const response = await fetch(`${this.coreEngineUrl}/v1/auth/me`, {
@@ -72,16 +61,6 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
             errorCode: 'AUTH_TOKEN_INVALID',
           });
       }
-
-      const body = await response.json() as {
-        data: {
-          accessToken: string,
-          refreshToken: string,
-          tokenType: string, // "Bearer"
-          expiresIn: number  // 900
-        }
-      };
-      profile = body.data;
     } catch (err) {
       if (err instanceof UnauthorizedException) throw err;
       throw new UnauthorizedException({
