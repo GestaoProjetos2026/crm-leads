@@ -9,18 +9,25 @@ export const LoginScreen = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [loadingLoginLocal, setLoadingLoginLocal] = useState(false);
+  const [loadingLoginCore, setLoadingLoginCore] = useState(false);
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     const button = (e.nativeEvent as SubmitEvent).submitter as HTMLButtonElement;
+    const buttonName = button.name as 'core' | 'salesweakness'
 
     e.preventDefault();
     setError('');
-    setLoading(true);
+
+    if (buttonName === 'salesweakness')
+      setLoadingLoginLocal(true);
+    else if (buttonName === 'core')
+      setLoadingLoginCore(true);
 
     try {
-      const response = await authApi.login(email, password, button.name as 'core' | 'salesweakness');
+      const response = await authApi.login(email, password, buttonName);
       const token = response.data.access_token;
       
       // Decodifica o JWT base64 para pegar os roles (Core Engine JWT usa 'roles' em vez de 'profile')
@@ -36,7 +43,6 @@ export const LoginScreen = () => {
       
       navigate('/dashboard');
     } catch (err: any) {
-      setLoading(false);
       if (isAxiosError(err)) {
         if (!err.response) {
           setError('Erro de conexão: Não foi possível alcançar o servidor.');
@@ -50,6 +56,9 @@ export const LoginScreen = () => {
       } else {
         setError('Ocorreu um erro inesperado.');
       }
+    } finally {
+      setLoadingLoginLocal(false);
+      setLoadingLoginCore(false);
     }
   };
 
@@ -93,19 +102,54 @@ export const LoginScreen = () => {
             />
           </div>
 
-          <div>
+          <div style={{ position: 'relative' }}>
             <label htmlFor="password" style={{ display: 'block', color: 'var(--text-secondary)', marginBottom: '0.5rem', fontSize: '0.875rem' }}>
               Senha
             </label>
             <input
               id="password"
-              type="password"
+              type={showPassword ? 'text' : 'password'}
               placeholder="••••••••"
               required
               value={password}
               onChange={(e) => { setPassword(e.target.value); setError(''); }}
-              style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: `1px solid ${error ? 'rgba(239, 68, 68, 0.5)' : 'var(--border-color)'}`, background: 'var(--bg-primary)', color: 'var(--text-primary)', outline: 'none', transition: 'border-color 0.2s' }}
+              style={{ width: '100%', padding: '0.75rem', paddingRight: '2.5rem', borderRadius: '8px', border: `1px solid ${error ? 'rgba(239, 68, 68, 0.5)' : 'var(--border-color)'}`, background: 'var(--bg-primary)', color: 'var(--text-primary)', outline: 'none', transition: 'border-color 0.2s' }}
             />
+
+            <button
+              type="button"
+              onClick={() => setShowPassword((s) => !s)}
+              aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
+              title={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
+              style={{
+                position: 'absolute',
+                right: '0.5rem',
+                top: '50%',
+                background: 'transparent',
+                border: 'none',
+                padding: '0.25rem',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                color: 'var(--text-secondary)'
+              }}
+            >
+              {showPassword ? (
+                // eye-off / hidden
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M3 3L21 21" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d="M10.58 10.58A3 3 0 0113.42 13.42" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d="M9.88 5.07C11.02 4.82 12.26 4.75 13.5 5.05C17 5.9 20 9 21 12C20.26 14.04 18.88 15.77 16.94 17.08" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              ) : (
+                // eye / visible
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7S2 12 2 12z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                  <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              )}
+            </button>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -120,26 +164,26 @@ export const LoginScreen = () => {
             name="salesweakness"
             type="submit"
             className="btn btn-primary"
-            disabled={loading}
+            disabled={loadingLoginLocal}
             style={{
               width: '100%', padding: '0.875rem', marginTop: '0.5rem', fontSize: '1rem',
-              opacity: loading ? 0.7 : 1, cursor: loading ? 'wait' : 'pointer',
+              opacity: loadingLoginLocal ? 0.7 : 1, cursor: loadingLoginLocal ? 'wait' : 'pointer',
             }}
           >
-            {loading ? 'Entrando...' : 'Entrar'}
+            {loadingLoginLocal ? 'Entrando...' : 'Entrar'}
           </button>
           <div className="divider" style={{ display: 'flex', alignItems: 'center', justifyContent: 'right' }}>
             <button
               name="core"
               type="submit"
               className="btn btn-primary"
-              disabled={loading}
+              disabled={loadingLoginLocal}
               style={{
                 width: 'fit-content', padding: '0.875rem', fontSize: '1rem',
-                opacity: loading ? 0.7 : 1, cursor: loading ? 'wait' : 'pointer',
+                opacity: loadingLoginLocal ? 0.7 : 1, cursor: loadingLoginLocal ? 'wait' : 'pointer',
               }}
             >
-              {loading ? 'Entrando...' : 'Cooregle'}
+              {loadingLoginCore ? 'Entrando...' : 'Cooregle'}
             </button>
           </div>
         </form>
